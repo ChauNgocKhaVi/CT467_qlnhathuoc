@@ -1,0 +1,81 @@
+/* Header */
+.custom-header {
+    background-color: #91c2f3; 
+    color: white;
+    padding: 15px 0;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+
+
+/*Hiệu ứng hover cho nút */
+.custom-header .btn-outline-light:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+/* Điều chỉnh nút đăng ký */
+.custom-header .btn-light {
+    background-color: white;
+    border: none;
+    color: #007bff;
+}
+
+.custom-header .btn-light:hover {
+    background-color: #dbeafe; 
+}
+
+/*Trang chào mừng */
+.welcome-container {
+    height: 80vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    background-color: #fff; 
+}
+
+.welcome-box {
+    background: rgba(255, 255, 255, 0.95);
+    padding: 40px;
+    border-radius: 15px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    max-width: 600px;
+}
+
+h1 {
+    font-size: 2.5rem;
+    font-weight: bold;
+    color: #1E3A5F; 
+}
+
+p {
+    font-size: 1.2rem;
+    margin-top: 10px;
+}
+
+/*Form đăng nhập/đăng ký */
+form {
+    width: 300px;
+    margin: auto;
+}
+
+input {
+    width: 100%;
+    padding: 10px;
+    margin: 5px 0;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+button {
+    width: 100%;
+    padding: 10px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+}
+
+button:hover {
+    background-color: #0056b3;
+}
