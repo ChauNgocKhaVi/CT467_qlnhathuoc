@@ -2,42 +2,46 @@
 ob_start(); // Bật buffer output để tránh lỗi header
 session_start();
 require_once __DIR__ . '/../src/bootstrap.php';
-
-use CT467\Labs\User;
-
-$user = new User($pdo); 
+require_once __DIR__ . '/../src/functions.php';
 
 $error = "";
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $usernameOrEmail = trim($_POST['usernameOrEmail']);
-    $password = trim($_POST['password']);
+    $tenDangNhap = trim($_POST['usernameOrEmail']);
+    $matKhau = trim($_POST['password']);
 
-    if (!empty($usernameOrEmail) && !empty($password)) {
-        $loggedInUser = $user->login($usernameOrEmail, $password);
+    if (!empty($tenDangNhap) && !empty($matKhau)) {
+        $result = dangNhap($pdo, $tenDangNhap, $matKhau);
 
-        if ($loggedInUser) {
-            $_SESSION['user'] = $loggedInUser;
-            header("Location: index.php");
+        if ($result === true) {
+            header("Location: index.php"); // Chuyển hướng sau khi đăng nhập thành công
             exit();
+        } else {
+            $error = $result; // Nhận thông báo lỗi từ `dangNhap()`
         }
-
+    } else {
+        $error = "Vui lòng nhập đầy đủ thông tin!";
     }
 }
 
 include __DIR__ . '/../src/partials/head.php';
-// include __DIR__ . '/../src/partials/header.php';
 ?>
 
 <div class="container d-flex justify-content-center align-items-center mt-3" style="min-height: 80vh;">
     <div class="card shadow-lg p-4 rounded" style="max-width: 500px; width: 100%;">
         <h2 class="text-center mb-4">Đăng Nhập</h2>
+
+        <!-- Hiển thị lỗi nếu có -->
+        <?php if (!empty($error)): ?>
+            <div class="alert alert-danger text-center"><?php echo htmlspecialchars($error); ?></div>
+        <?php endif; ?>
+
         <form method="POST" action="">
             <div class="mb-3">
                 <div class="input-group">
                     <span class="input-group-text"><i class="fas fa-user"></i></span>
-                    <input type="text" class="form-control" name="usernameOrEmail"
-                        placeholder="Nhập tên đăng nhập hoặc email" required>
+                    <input type="text" class="form-control" name="usernameOrEmail" placeholder="Nhập tên đăng nhập"
+                        required>
                 </div>
             </div>
             <div class="mb-3">
@@ -51,6 +55,7 @@ include __DIR__ . '/../src/partials/head.php';
                 <button type="submit" class="btn btn-outline-primary" style="width: 120px;">Đăng Nhập</button>
             </div>
         </form>
+
         <p class="text-center mt-3">Chưa có tài khoản? <a href="register.php">Đăng ký ngay</a></p>
     </div>
 </div>
