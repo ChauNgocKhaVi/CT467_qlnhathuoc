@@ -14,19 +14,35 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $xacNhanMatKhau = trim($_POST['confirmPassword']);
     $vaiTro = 'user'; // Mặc định đăng ký với vai trò người dùng
 
-    // Kiểm tra dữ liệu đầu vào
-    $errors = validateInput($tenDangNhap, $email, $matKhau, $xacNhanMatKhau, $soDienThoai);
-
-    if (!empty($errors)) {
-        $error = implode("<br>", $errors);
+    // Kiểm tra dữ liệu đầu vào (không kiểm tra trùng lặp vì đã có TRIGGER xử lý)
+    if ($matKhau !== $xacNhanMatKhau) {
+        $error = "Mật khẩu xác nhận không khớp!";
     } else {
-        // Thực hiện đăng ký
-        $result = dangKy($pdo, $hoTen, $tenDangNhap, $matKhau, $email, $soDienThoai, $vaiTro);
+        // Hash mật khẩu bằng password_hash() (bcrypt)
+        $hashedMatKhau = password_hash($matKhau, PASSWORD_BCRYPT);
 
-        if ($result === true) {
-            $success = "Đăng ký thành công! <a href='login.php'>Đăng nhập ngay</a>";
-        } else {
-            $error = $result;
+        try {
+            // Gọi Stored Procedure DangKy
+            $stmt = $pdo->prepare("CALL DangKy(?, ?, ?, ?, ?, @ketqua)");
+            $stmt->execute([$hoTen, $tenDangNhap, $email, $soDienThoai, $hashedMatKhau]);
+
+            // Lấy kết quả từ biến OUT
+            $result = $pdo->query("SELECT @ketqua AS KetQua")->fetch(PDO::FETCH_ASSOC);
+
+            if ($result["KetQua"] === "Đăng ký thành công!") {
+                header("Location: login.php");
+                exit();
+            } else {
+                $error = $result["KetQua"];
+            }
+        } catch (PDOException $e) {
+            // Lấy thông báo lỗi từ Trigger bằng cách tách chuỗi
+            $matches = [];
+            if (preg_match("/: (\d+) (.+)/", $e->getMessage(), $matches)) {
+                $error = $matches[2]; // Chỉ lấy phần thông báo lỗi
+            } else {
+                $error = "Lỗi không xác định!"; // Nếu không lấy được lỗi cụ thể
+            }
         }
     }
 }
@@ -34,17 +50,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 include __DIR__ . '/../src/partials/head.php';
 ?>
 
+
 <div class="container d-flex justify-content-center align-items-center mt-3" style="min-height: 80vh;">
     <div class="card shadow-lg p-4 rounded" style="max-width: 600px; width: 100%;">
         <h2 class="text-center mb-4">Đăng Ký</h2>
 
-        <?php if (!empty($error)): ?>
-            <div class="alert alert-danger text-center"><?php echo htmlspecialchars($error); ?></div>
-        <?php endif; ?>
 
-        <?php if (!empty($success)): ?>
-            <div class="alert alert-success text-center"><?php echo $success; ?></div>
-        <?php endif; ?>
 
         <form method="POST" action="" enctype="multipart/form-data">
             <div class="mb-3">
