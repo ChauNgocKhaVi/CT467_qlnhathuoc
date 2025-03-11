@@ -24,3 +24,31 @@ BEGIN
     WHERE MaThuoc = NEW.MaThuoc;
 END $$
 DELIMITER ;
+
+-- Kiểm tra trùng lặp
+DROP TRIGGER IF EXISTS kt_trunglap;
+
+DELIMITER $$
+
+CREATE TRIGGER kt_trunglap BEFORE INSERT ON Admin
+FOR EACH ROW
+BEGIN
+    -- Kiểm tra tên đăng nhập trùng
+    IF EXISTS (SELECT 1 FROM Admin WHERE TenDangNhap = NEW.TenDangNhap) THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Tên đăng nhập đã tồn tại!';
+    END IF;
+
+    -- Kiểm tra email trùng
+    IF EXISTS (SELECT 1 FROM Admin WHERE Email = NEW.Email) THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Email đã tồn tại!';
+    END IF;
+
+    -- Kiểm tra số điện thoại có hợp lệ không
+    IF NEW.SoDienThoai NOT REGEXP '^[0-9]{10,15}$' THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Số điện thoại không hợp lệ!';
+    END IF;
+END$$
+
+DELIMITER ;
+
+
