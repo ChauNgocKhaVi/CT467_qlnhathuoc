@@ -1,5 +1,8 @@
 <?php
-
+// Kiểm tra xem session đã được khởi tạo chưa trước khi gọi session_start()
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 require_once __DIR__ . '/../libraries/Psr4AutoloaderClass.php';
 
 $loader = new Psr4AutoloaderClass();
