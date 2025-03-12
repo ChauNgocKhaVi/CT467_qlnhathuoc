@@ -12,37 +12,21 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $soDienThoai = trim($_POST['sodienthoai']);
     $matKhau = trim($_POST['password']);
     $xacNhanMatKhau = trim($_POST['confirmPassword']);
-    $vaiTro = 'user'; // Mặc định đăng ký với vai trò người dùng
 
-    // Kiểm tra dữ liệu đầu vào (không kiểm tra trùng lặp vì đã có TRIGGER xử lý)
-    if ($matKhau !== $xacNhanMatKhau) {
-        $error = "Mật khẩu xác nhận không khớp!";
+    // Kiểm tra dữ liệu đầu vào bằng validateInput()
+    $errors = validateInput($tenDangNhap, $email, $matKhau, $xacNhanMatKhau, $soDienThoai);
+
+    if (!empty($errors)) {
+        $error = implode('<br>', $errors);
     } else {
-        // Hash mật khẩu bằng password_hash() (bcrypt)
-        $hashedMatKhau = password_hash($matKhau, PASSWORD_BCRYPT);
+        // Gọi hàm dangKy() từ functions.php
+        $ketQua = dangKy($pdo, $hoTen, $tenDangNhap, $matKhau, $email, $soDienThoai);
 
-        try {
-            // Gọi Stored Procedure DangKy
-            $stmt = $pdo->prepare("CALL DangKy(?, ?, ?, ?, ?, @ketqua)");
-            $stmt->execute([$hoTen, $tenDangNhap, $email, $soDienThoai, $hashedMatKhau]);
-
-            // Lấy kết quả từ biến OUT
-            $result = $pdo->query("SELECT @ketqua AS KetQua")->fetch(PDO::FETCH_ASSOC);
-
-            if ($result["KetQua"] === "Đăng ký thành công!") {
-                header("Location: login.php");
-                exit();
-            } else {
-                $error = $result["KetQua"];
-            }
-        } catch (PDOException $e) {
-            // Lấy thông báo lỗi từ Trigger bằng cách tách chuỗi
-            $matches = [];
-            if (preg_match("/: (\d+) (.+)/", $e->getMessage(), $matches)) {
-                $error = $matches[2]; // Chỉ lấy phần thông báo lỗi
-            } else {
-                $error = "Lỗi không xác định!"; // Nếu không lấy được lỗi cụ thể
-            }
+        if ($ketQua === "Đăng ký thành công!") {
+            header("Location: login.php");
+            exit();
+        } else {
+            $error = $ketQua; // Hiển thị lỗi nếu có
         }
     }
 }
