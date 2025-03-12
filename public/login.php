@@ -14,6 +14,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $result = dangNhap($pdo, $tenDangNhap, $matKhau);
 
         if ($result === true) {
+            // Lưu session khi đăng nhập thành công
+            $_SESSION["username"] = $tenDangNhap;
+            $_SESSION['success_message'] = "Đăng nhập thành công! Chào mừng $tenDangNhap.";
             header("Location: index.php"); // Chuyển hướng sau khi đăng nhập thành công
             exit();
         } else {
