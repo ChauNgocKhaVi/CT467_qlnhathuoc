@@ -141,30 +141,6 @@ function layThuocTheoID(PDO $pdo, int $maThuoc): array|false
     return $stmt->fetch(PDO::FETCH_ASSOC);
 }
 
-// Lấy danh sách tất cả thể loại thuốc
-function layTatCaLoaiThuoc(PDO $pdo): array
-{
-    $query = "SELECT * FROM LoaiThuoc";
-    $stmt = $pdo->query($query);
-    return $stmt->fetchAll(PDO::FETCH_ASSOC);
-}
-
-// Lấy danh sách tất cả nhà cung cấp
-function layTatCaNhaCungCap(PDO $pdo): array
-{
-    $query = "SELECT * FROM NhaCungCap";
-    $stmt = $pdo->query($query);
-    return $stmt->fetchAll(PDO::FETCH_ASSOC);
-}
-
-// Lấy danh sách tất cả hãng sản xuất
-function layTatCaHangSanXuat(PDO $pdo): array
-{
-    $query = "SELECT * FROM HangSX";
-    $stmt = $pdo->query($query);
-    return $stmt->fetchAll(PDO::FETCH_ASSOC);
-}
-
 // Lấy danh sách thuốc theo loại
 function layThuocTheoLoai(PDO $pdo, int $maLoai): array
 {
@@ -202,6 +178,57 @@ function layHoaDonBanThuoc(PDO $pdo): array
             FROM HoaDon hd 
             LEFT JOIN KhachHang kh ON hd.MaKH = kh.MaKH 
             ORDER BY hd.NgayLap DESC";
+    $stmt = $pdo->query($query);
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
+
+// --------------------- LẤY LOẠI THUỐC ---------------------
+
+// Lấy danh sách tất cả thể loại thuốc
+function layTatCaLoaiThuoc(PDO $pdo): array
+{
+    $query = "SELECT * FROM LoaiThuoc";
+    $stmt = $pdo->query($query);
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
+
+
+// --------------------- LẤY NHÀ CUNG CẤP ---------------------
+
+// Lấy danh sách tất cả nhà cung cấp
+function layTatCaNhaCungCap(PDO $pdo): array
+{
+    $query = "SELECT * FROM NhaCungCap";
+    $stmt = $pdo->query($query);
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
+
+// --------------------- LẤY HãNG SẢN XUẤT ---------------------
+
+// Lấy danh sách tất cả hãng sản xuất
+function layTatCaHangSanXuat(PDO $pdo): array
+{
+    $query = "SELECT * FROM HangSX";
+    $stmt = $pdo->query($query);
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
+
+// --------------------- LẤY DANH SÁCH KHÁCH HÀNG ---------------------
+
+// Lấy danh sách tất cả hãng sản xuất
+function layTatCaKhachHang(PDO $pdo): array
+{
+    $query = "SELECT * FROM KhachHang";
+    $stmt = $pdo->query($query);
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
+
+// --------------------- LẤY DANH SÁCH NHÂN VIÊN ---------------------
+
+// Lấy danh sách tất cả hãng sản xuất
+function layTatCaNhanVien(PDO $pdo): array
+{
+    $query = "SELECT * FROM Admin";
     $stmt = $pdo->query($query);
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
