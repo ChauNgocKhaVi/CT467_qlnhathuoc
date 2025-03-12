@@ -52,54 +52,48 @@ function validateInput(string $tenDangNhap, string $email, string $matKhau, stri
 }
 
 // --------------------- ĐĂNG KÝ NGƯỜI DÙNG ---------------------
-function dangKy(PDO $pdo, string $hoTen, string $tenDangNhap, string $matKhau, string $email, string $soDienThoai, string $vaiTro): string|bool
+function dangKy(PDO $pdo, string $hoTen, string $tenDangNhap, string $matKhau, string $email, string $soDienThoai): string|bool
 {
-    // Kiểm tra tài khoản đã tồn tại chưa
-    $query = "SELECT 1 FROM Admin WHERE TenDangNhap = :tenDangNhap OR Email = :email";
-    $stmt = $pdo->prepare($query);
-    $stmt->bindParam(':tenDangNhap', $tenDangNhap);
-    $stmt->bindParam(':email', $email);
-    $stmt->execute();
-
-    if ($stmt->fetch()) {
-        return 'Tên đăng nhập hoặc email đã tồn tại!';
-    }
-
-    // Mã hóa mật khẩu
+    // Mã hóa mật khẩu trước khi gửi vào Stored Procedure
     $hashed_password = password_hash($matKhau, PASSWORD_DEFAULT);
 
-    // Chèn dữ liệu vào database
-    $query = "INSERT INTO Admin (HoTen, TenDangNhap, MatKhau, Email, SoDienThoai, VaiTro, TrangThai) 
-            VALUES (:hoTen, :tenDangNhap, :matKhau, :email, :soDienThoai, 'nhanvien', 'active')";
+    // Gọi Stored Procedure DangKy
+    $query = "CALL DangKy(:hoTen, :tenDangNhap, :email, :soDienThoai, :matKhau, @KetQua)";
     $stmt = $pdo->prepare($query);
     $stmt->bindParam(':hoTen', $hoTen);
     $stmt->bindParam(':tenDangNhap', $tenDangNhap);
-    $stmt->bindParam(':matKhau', $hashed_password);
     $stmt->bindParam(':email', $email);
     $stmt->bindParam(':soDienThoai', $soDienThoai);
+    $stmt->bindParam(':matKhau', $hashed_password);
+
     if ($stmt->execute()) {
-        return true; // Đăng ký thành công
+        // Lấy kết quả trả về từ biến @KetQua
+        $result = $pdo->query("SELECT @KetQua AS KetQua")->fetch(PDO::FETCH_ASSOC);
+        return $result['KetQua']; // Trả về thông báo từ Stored Procedure
     } else {
-        return 'Lỗi đăng ký, vui lòng thử lại.';
+        return 'Lỗi đăng ký, vui lòng thử lại!';
     }
 }
 
 // --------------------- ĐĂNG NHẬP NGƯỜI DÙNG ---------------------
 function dangNhap(PDO $pdo, string $tenDangNhap, string $matKhau): string|bool
 {
-    $query = "SELECT MaND, HoTen, MatKhau, VaiTro FROM Admin WHERE TenDangNhap = :tenDangNhap AND TrangThai = 'active'";
+    // Gọi Stored Procedure DangNhap
+    $query = "CALL DangNhap(:tenDangNhap, @MatKhau, @VaiTro, @KetQua)";
     $stmt = $pdo->prepare($query);
     $stmt->bindParam(':tenDangNhap', $tenDangNhap);
     $stmt->execute();
-    $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
-    if ($user && password_verify($matKhau, $user['MatKhau'])) {
-        $_SESSION['MaND'] = $user['MaND'];
-        $_SESSION['HoTen'] = $user['HoTen'];
-        $_SESSION['VaiTro'] = $user['VaiTro'];
+    // Lấy kết quả từ biến OUT
+    $result = $pdo->query("SELECT @MatKhau AS MatKhau, @VaiTro AS VaiTro, @KetQua AS KetQua")->fetch(PDO::FETCH_ASSOC);
+
+    if ($result['KetQua'] === 'OK' && password_verify($matKhau, $result['MatKhau'])) {
+        // Lưu session đăng nhập
+        $_SESSION['TenDangNhap'] = $tenDangNhap;
+        $_SESSION['VaiTro'] = $result['VaiTro'];
         return true; // Đăng nhập thành công
     } else {
-        return 'Sai tên đăng nhập hoặc mật khẩu!';
+        return $result['KetQua']; // Trả về thông báo từ Stored Procedure (VD: "Tên đăng nhập không tồn tại!")
     }
 }
 
