@@ -110,4 +110,99 @@ function dangXuat(): void
     header('Location: login.php');
     exit();
 }
+
+// ----------------------------- THUỐC ---------------------------------
+
+// Lấy danh sách tất cả các loại thuốc
+function layTatCaThuoc(PDO $pdo): array
+{
+    $query = "SELECT t.*, t.DonGia AS Gia, t.SoLuongTon AS SoLuong, l.TenLoai, h.TenHang, n.TenNCC 
+            FROM Thuoc t
+            JOIN LoaiThuoc l ON t.MaLoai = l.MaLoai
+            JOIN HangSX h ON t.MaHangSX = h.MaHangSX
+            JOIN NhaCungCap n ON t.MaNCC = n.MaNCC
+            ";
+    $stmt = $pdo->query($query);
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
+
+// Lấy thông tin thuốc theo ID
+function layThuocTheoID(PDO $pdo, int $maThuoc): array|false
+{
+    $query = "SELECT t.*, l.TenLoai, h.TenHang, n.TenNCC 
+            FROM Thuoc t
+            JOIN LoaiThuoc l ON t.MaLoai = l.MaLoai
+            JOIN HangSX h ON t.MaHangSX = h.MaHangSX
+            JOIN NhaCungCap n ON t.MaNCC = n.MaNCC
+            WHERE t.MaThuoc = :maThuoc";
+    $stmt = $pdo->prepare($query);
+    $stmt->bindParam(':maThuoc', $maThuoc, PDO::PARAM_INT);
+    $stmt->execute();
+    return $stmt->fetch(PDO::FETCH_ASSOC);
+}
+
+// Lấy danh sách tất cả thể loại thuốc
+function layTatCaLoaiThuoc(PDO $pdo): array
+{
+    $query = "SELECT * FROM LoaiThuoc";
+    $stmt = $pdo->query($query);
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
+
+// Lấy danh sách tất cả nhà cung cấp
+function layTatCaNhaCungCap(PDO $pdo): array
+{
+    $query = "SELECT * FROM NhaCungCap";
+    $stmt = $pdo->query($query);
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
+
+// Lấy danh sách tất cả hãng sản xuất
+function layTatCaHangSanXuat(PDO $pdo): array
+{
+    $query = "SELECT * FROM HangSX";
+    $stmt = $pdo->query($query);
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
+
+// Lấy danh sách thuốc theo loại
+function layThuocTheoLoai(PDO $pdo, int $maLoai): array
+{
+    $query = "SELECT * FROM Thuoc WHERE MaLoai = :maLoai";
+    $stmt = $pdo->prepare($query);
+    $stmt->bindParam(':maLoai', $maLoai, PDO::PARAM_INT);
+    $stmt->execute();
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
+
+// Lấy danh sách thuốc theo nhà cung cấp
+function layThuocTheoNCC(PDO $pdo, int $maNCC): array
+{
+    $query = "SELECT * FROM Thuoc WHERE MaNCC = :maNCC";
+    $stmt = $pdo->prepare($query);
+    $stmt->bindParam(':maNCC', $maNCC, PDO::PARAM_INT);
+    $stmt->execute();
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
+
+// Lấy danh sách thuốc theo hãng sản xuất
+function layThuocTheoHangSX(PDO $pdo, int $maHangSX): array
+{
+    $query = "SELECT * FROM Thuoc WHERE MaHangSX = :maHangSX";
+    $stmt = $pdo->prepare($query);
+    $stmt->bindParam(':maHangSX', $maHangSX, PDO::PARAM_INT);
+    $stmt->execute();
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
+
+// --------------------- LẤY HÓA ĐƠN BÁN THUỐC ---------------------
+function layHoaDonBanThuoc(PDO $pdo): array
+{
+    $query = "SELECT hd.MaHD, kh.TenKH, kh.SoDienThoai, hd.NgayLap, hd.TongTien 
+            FROM HoaDon hd 
+            LEFT JOIN KhachHang kh ON hd.MaKH = kh.MaKH 
+            ORDER BY hd.NgayLap DESC";
+    $stmt = $pdo->query($query);
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
 ?>
