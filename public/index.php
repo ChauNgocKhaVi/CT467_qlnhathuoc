@@ -21,6 +21,12 @@ $KHList = layTatCaKhachHang($pdo); // Gọi hàm lấy danh sách khách hàng
 $hoadonList = layHoaDonBanThuoc($pdo); // Gọi hàm lấy danh sách hóa đơn
 $nvList = layTatCaNhanVien($pdo); // Gọi hàm lấy danh sách nhân viên
 
+capNhatThongBaoThuocHetHan($pdo); // Gọi hàm cập nhật thông báo thuốc sắp hết hạn
+$thongBaoList = layThongBaoThuocHetHan($pdo); // Gọi hàm lấy danh sách thông báo thuốc sắp hết hạn
+$thuocSapHetHan = layThongBaoThuocHetHan($pdo);
+$thuocSapHetHanIds = array_column($thuocSapHetHan, 'MaThuoc'); // Lấy danh sách mã thuốc hết hạn
+
+
 $chiTietHD = [];
 $maHD = '';
 
@@ -207,7 +213,8 @@ include __DIR__ . '/../src/partials/header.php';
                         <a class="nav-link" href="#thongKe" id="showThongKe"><strong>Thống kê doanh thu</strong></a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#tonKho" id="showTonKho"><strong>Báo cáo tồn kho</strong></a>
+                        <a class="nav-link" href="#thongBao" id="showThongBao"><strong>Thông báo thuốc sắp hết
+                                hạn</strong></a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="#nhapThuoc" id="showNhapThuoc"><strong>Nhập thuốc từ
@@ -240,7 +247,8 @@ include __DIR__ . '/../src/partials/header.php';
 
             <!-- Thống kê danh thu -->
 
-            <!-- Báo cáo tồn kho -->
+            <!-- Thông báo Thuốc sắp hết hạn -->
+            <?php include __DIR__ . '/thongbao.php'; ?>
 
             <!-- Nhập thuốc từ Excel -->
 
@@ -272,7 +280,7 @@ include __DIR__ . '/../src/partials/header.php';
             { linkId: 'showLoai', sectionId: 'loai' },
             { linkId: 'showHoadon', sectionId: 'hoaDon' },
             { linkId: 'showThongKe', sectionId: 'thongKe' },
-            { linkId: 'showTonKho', sectionId: 'tonKho' },
+            { linkId: 'showThongBao', sectionId: 'thongBao' },
             { linkId: 'showNCC', sectionId: 'ncc' },
             { linkId: 'showHSX', sectionId: 'hsx' },
             { linkId: 'showNhapThuoc', sectionId: 'nhapThuoc' },
@@ -361,6 +369,7 @@ include __DIR__ . '/../src/partials/header.php';
         <?php endif; ?>
     });
 </script>
+
 <script>
     // Tự động ẩn thông báo sau 1 giây
     setTimeout(function () {

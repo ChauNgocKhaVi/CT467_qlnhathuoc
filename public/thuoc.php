@@ -94,7 +94,11 @@
             </thead>
             <tbody>
                 <?php foreach ($thuocList as $thuoc): ?>
-                    <tr>
+                    <?php
+                    $isSapHetHan = in_array($thuoc['MaThuoc'], $thuocSapHetHanIds); // Kiểm tra thuốc sắp hết hạn
+                    $rowClass = $isSapHetHan ? 'table-danger' : ''; // Nếu hết hạn, tô đỏ cả hàng
+                    ?>
+                    <tr class="<?php echo $rowClass; ?>"> <!-- Áp dụng class vào cả hàng -->
                         <td class="text-center"><?php echo htmlspecialchars($thuoc['MaThuoc']); ?></td>
                         <td><?php echo htmlspecialchars($thuoc['TenThuoc']); ?></td>
                         <td><?php echo htmlspecialchars($thuoc['TenLoai']); ?></td>

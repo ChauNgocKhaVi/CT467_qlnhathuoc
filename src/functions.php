@@ -379,5 +379,36 @@ function xoaNhanVien($pdo, $MaND)
     }
 }
 
+// --------------- THÔNG BÁO THUỐC HẾT HẠN ---------------------
+
+// Lấy danh sách thông báo thuốc hết hạn
+function layThongBaoThuocHetHan($pdo)
+{
+    $stmt = $pdo->prepare("
+        SELECT tb.*, t.TenThuoc 
+        FROM ThongBao tb
+        JOIN Thuoc t ON tb.MaThuoc = t.MaThuoc
+        WHERE tb.TrangThai = 'chua_xem'
+        ORDER BY tb.ThoiGianThongBao DESC
+    ");
+    $stmt->execute();
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
+
+// Cập nhật thông báo thuốc hết hạn
+function capNhatThongBaoThuocHetHan($pdo)
+{
+    $stmt = $pdo->prepare("
+        INSERT INTO ThongBao (MaThuoc, NoiDung)
+        SELECT t.MaThuoc, CONCAT('Thuốc \"', t.TenThuoc, '\" sắp hết hạn vào ngày ', t.HanSuDung)
+        FROM Thuoc t
+        WHERE t.HanSuDung <= DATE_ADD(CURDATE(), INTERVAL 30 DAY)
+        AND NOT EXISTS (
+            SELECT 1 FROM ThongBao tb WHERE tb.MaThuoc = t.MaThuoc AND tb.TrangThai = 'chua_xem'
+        )
+    ");
+    $stmt->execute();
+}
+
 
 ?>
