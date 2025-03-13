@@ -11,6 +11,7 @@ if (!isset($_SESSION["username"])) {
     unset($_SESSION['success_message']); // Xóa session sau khi hiển thị
 }
 
+
 $thuocList = layTatCaThuoc($pdo); // Gọi hàm lấy danh sách thuốc
 $loaiList = layTatCaLoaiThuoc($pdo); // Gọi hàm lấy danh sách loại thuốc
 $nccList = layTatCaNhaCungCap($pdo); // Gọi hàm lấy danh sách nhà cung cấp
@@ -19,80 +20,96 @@ $KHList = layTatCaKhachHang($pdo); // Gọi hàm lấy danh sách khách hàng
 $hoadonList = layHoaDonBanThuoc($pdo); // Gọi hàm lấy danh sách hóa đơn
 $nvList = layTatCaNhanVien($pdo); // Gọi hàm lấy danh sách nhân viên
 
+$chiTietHD = [];
+$maHD = '';
+
+if (isset($_GET['MaHD']) && !empty($_GET['MaHD'])) {
+    $maHD = $_GET['MaHD'];
+    $chiTietHD = layChiTietHoaDon($pdo, $maHD);
+}
+
+$successLoai = $_GET['successLoai'] ?? ''; // Lấy thông báo thành công
+$successNCC = $_GET['successNCC'] ?? ''; // Lấy thông báo thành công
+$successHangSX = $_GET['successHangSX'] ?? ''; // Lấy thông báo thành công
+$successKH= $_GET['successKH'] ?? ''; // Lấy thông báo thành công
+$successHD= $_GET['successHD'] ?? ''; // Lấy thông báo thành công
+
+
+
 include __DIR__ . '/../src/partials/head.php';
 include __DIR__ . '/../src/partials/header.php';
 ?>
 
 <style>
-    .sidebar {
-        background: linear-gradient(135deg, #74ebd5, #acb6e5);
-        padding: 10px;
-        border-radius: 5px;
-        box-shadow: 0 5px 8px rgba(0, 0, 0, 0.1);
-    }
+.sidebar {
+    background: linear-gradient(135deg, #74ebd5, #acb6e5);
+    padding: 10px;
+    border-radius: 5px;
+    box-shadow: 0 5px 8px rgba(0, 0, 0, 0.1);
+}
 
-    .nav-link {
-        color: #000;
-        padding: 12px 15px;
-        margin-bottom: 5px;
-        border-radius: 5px;
-        display: block;
-        transition: background-color 0.3s, color 0.3s;
-    }
+.nav-link {
+    color: #000;
+    padding: 12px 15px;
+    margin-bottom: 5px;
+    border-radius: 5px;
+    display: block;
+    transition: background-color 0.3s, color 0.3s;
+}
 
-    .nav-item {
-        list-style: none;
-    }
+.nav-item {
+    list-style: none;
+}
 
-    .nav-link:hover {
-        background-color: #e9ecef;
-        /* Màu xám nhạt */
-        color: #000;
-        /* Giữ nguyên màu chữ */
-    }
+.nav-link:hover {
+    background-color: #e9ecef;
+    /* Màu xám nhạt */
+    color: #000;
+    /* Giữ nguyên màu chữ */
+}
 
-    .nav-link.active {
-        background-color: #073A4B;
-        color: white;
-    }
+.nav-link.active {
+    background-color: #073A4B;
+    color: white;
+}
 
-    .row {
-        display: flex;
-        justify-content: space-between;
-    }
+.row {
+    display: flex;
+    justify-content: space-between;
+}
 
-    .account-info {
-        display: flex;
-        align-items: center;
-        position: relative;
-    }
+.account-info {
+    display: flex;
+    align-items: center;
+    position: relative;
+}
 
-    .section-title {
-        font-size: 24px;
-        font-weight: bold;
-        margin-bottom: 20px;
-        position: relative;
-    }
+.section-title {
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 20px;
+    position: relative;
+}
 
-    .section-title::after {
-        content: '';
-        display: block;
-        width: 100px;
-        height: 4px;
-        background-color: rgb(9, 25, 208);
-        /* Màu hồng */
-        margin-top: 5px;
-    }
+.section-title::after {
+    content: '';
+    display: block;
+    width: 100px;
+    height: 4px;
+    background-color: rgb(9, 25, 208);
+    /* Màu hồng */
+    margin-top: 5px;
+}
 
-    .d-flex .form-control {
-        width: 150px;
-    }
+.d-flex .form-control {
+    width: 150px;
+}
 
-    #searchBtn {
-        height: 35px;
-        margin-top: 6px;
-        /* Điều chỉnh cho phù hợp */
-    }
+#searchBtn {
+    height: 35px;
+    margin-top: 6px;
+    /* Điều chỉnh cho phù hợp */
+}
 </style>
 
 <div class="container-fluid mt-5">
@@ -105,8 +122,10 @@ include __DIR__ . '/../src/partials/header.php';
                         <a class="nav-link" href="#thuoc" id="showThuoc"><strong>Quản lý thuốc</strong></a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#loai" id="showLoai"><strong>Quản lý loại thuốc</strong></a>
+                        <a class="nav-link" href="index.php?tab=loai" id="showLoai"><strong>Quản lý loại
+                                thuốc</strong></a>
                     </li>
+
                     <li class="nav-item">
                         <a class="nav-link" href="#ncc" id="showNCC"><strong>Quản lý nhà cung cấp</strong></a>
                     </li>
@@ -130,7 +149,7 @@ include __DIR__ . '/../src/partials/header.php';
                                 Excel</strong></a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#xuatFile" id="showXuatFile"><strong>Xuất danh sách thuốc ra
+                        <a class="nav-link" href="#xuatFile" id="showXuatFile"><strong>Xuất file
                                 Excel</strong></a>
                     </li>
                     <?php
@@ -182,20 +201,20 @@ include __DIR__ . '/../src/partials/header.php';
                         </thead>
                         <tbody>
                             <?php foreach ($thuocList as $thuoc): ?>
-                                <tr>
-                                    <td class="text-center"><?php echo htmlspecialchars($thuoc['MaThuoc']); ?></td>
-                                    <td><?php echo htmlspecialchars($thuoc['TenThuoc']); ?></td>
-                                    <td><?php echo htmlspecialchars($thuoc['TenLoai']); ?></td>
-                                    <td><?php echo htmlspecialchars($thuoc['TenHang']); ?></td>
-                                    <td><?php echo htmlspecialchars($thuoc['TenNCC']); ?></td>
-                                    <td><?php echo htmlspecialchars($thuoc['CongDung']); ?></td>
-                                    <td><?php echo number_format($thuoc['Gia'], 0, ',', '.'); ?></td>
-                                    <td class="text-center"><?php echo htmlspecialchars($thuoc['SoLuong']); ?></td>
-                                    <td>
-                                        <a href="#" class="btn btn-primary">Sửa</a>
-                                        <a href="#" class="btn btn-danger">Xóa</a>
-                                    </td>
-                                </tr>
+                            <tr>
+                                <td class="text-center"><?php echo htmlspecialchars($thuoc['MaThuoc']); ?></td>
+                                <td><?php echo htmlspecialchars($thuoc['TenThuoc']); ?></td>
+                                <td><?php echo htmlspecialchars($thuoc['TenLoai']); ?></td>
+                                <td><?php echo htmlspecialchars($thuoc['TenHang']); ?></td>
+                                <td><?php echo htmlspecialchars($thuoc['TenNCC']); ?></td>
+                                <td><?php echo htmlspecialchars($thuoc['CongDung']); ?></td>
+                                <td><?php echo number_format($thuoc['Gia'], 0, ',', '.'); ?></td>
+                                <td class="text-center"><?php echo htmlspecialchars($thuoc['SoLuong']); ?></td>
+                                <td>
+                                    <a href="#" class="btn btn-primary">Sửa</a>
+                                    <a href="#" class="btn btn-danger">Xóa</a>
+                                </td>
+                            </tr>
                             <?php endforeach; ?>
                         </tbody>
                     </table>
@@ -205,6 +224,10 @@ include __DIR__ . '/../src/partials/header.php';
             <!-- Loại thuốc -->
             <div class="container-fluid-fluid" id="loai">
                 <h2 class="section-title bg-light p-2 rounded potta-one-regular">Danh Sách Loại</h2>
+                <!-- Hiển thị thông báo -->
+                <?php if (!empty($successLoai)): ?>
+                <div class="alert alert-success alert-message"><?php echo htmlspecialchars($successLoai); ?></div>
+                <?php endif; ?>
                 <div class="d-flex justify-content-between align-items-center mb-3">
                     <!-- Tìm kiếm -->
                     <div class="d-flex">
@@ -231,15 +254,18 @@ include __DIR__ . '/../src/partials/header.php';
                     </thead>
                     <tbody>
                         <?php foreach ($loaiList as $loai): ?>
-                            <tr>
-                                <td class="text-center"><?php echo htmlspecialchars($loai['MaLoai']); ?></td>
-                                <td><?php echo htmlspecialchars($loai['TenLoai']); ?></td>
-                                <td><?php echo htmlspecialchars($loai['DonViTinh']); ?></td>
-                                <td>
-                                    <a href="#" class="btn btn-primary">Sửa</a>
-                                    <a href="#" class="btn btn-danger">Xóa</a>
-                                </td>
-                            </tr>
+                        <tr>
+                            <td class="text-center"><?php echo htmlspecialchars($loai['MaLoai']); ?></td>
+                            <td><?php echo htmlspecialchars($loai['TenLoai']); ?></td>
+                            <td><?php echo htmlspecialchars($loai['DonViTinh']); ?></td>
+                            <td>
+                                <a href="edit_loai.php?MaLoai=<?php echo $loai['MaLoai']; ?>"
+                                    class="btn btn-primary">Sửa</a>
+                                <a href="delete_loai.php?MaLoai=<?php echo $loai['MaLoai']; ?>" class="btn btn-danger"
+                                    onclick="return confirm('Bạn có chắc chắn muốn xóa?');">Xóa</a>
+                            </td>
+
+                        </tr>
                         <?php endforeach; ?>
                     </tbody>
                 </table>
@@ -248,6 +274,10 @@ include __DIR__ . '/../src/partials/header.php';
             <!-- Nhà cung cấp -->
             <div class="container-fluid-fluid" id="ncc">
                 <h2 class="section-title bg-light p-2 rounded potta-one-regular">Danh Sách Nhà Cung Cấp</h2>
+                <!-- Hiển thị thông báo -->
+                <?php if (!empty($successNCC)): ?>
+                <div class="alert alert-success alert-message"><?php echo htmlspecialchars($successNCC); ?></div>
+                <?php endif; ?>
                 <div class="d-flex justify-content-between align-items-center mb-3">
                     <!-- Tìm kiếm -->
                     <div class="d-flex">
@@ -268,21 +298,24 @@ include __DIR__ . '/../src/partials/header.php';
                         <tr>
                             <th class="text-center">Mã Nhà Cung Cấp</th>
                             <th>Tên Nhà Cung Cấp</th>
-                            <th>Số Điện Thoại/th>
+                            <th>Số Điện Thoại</th>
                             <th>Hành động</th>
                         </tr>
                     </thead>
                     <tbody>
                         <?php foreach ($nccList as $ncc): ?>
-                            <tr>
-                                <td class="text-center"><?php echo htmlspecialchars($ncc['MaNCC']); ?></td>
-                                <td><?php echo htmlspecialchars($ncc['TenNCC']); ?></td>
-                                <td><?php echo htmlspecialchars($ncc['SoDienThoai']); ?></td>
-                                <td>
-                                    <a href="#" class="btn btn-primary">Sửa</a>
-                                    <a href="#" class="btn btn-danger">Xóa</a>
-                                </td>
-                            </tr>
+                        <tr>
+                            <td class="text-center"><?php echo htmlspecialchars($ncc['MaNCC']); ?></td>
+                            <td><?php echo htmlspecialchars($ncc['TenNCC']); ?></td>
+                            <td><?php echo htmlspecialchars($ncc['SoDienThoai']); ?></td>
+                            <td>
+                                <a href="edit_ncc.php?MaNCC=<?php echo $ncc['MaNCC']; ?>"
+                                    class="btn btn-primary">Sửa</a>
+                                <a href="delete_ncc.php?MaNCC=<?php echo $ncc['MaNCC']; ?>" class="btn btn-danger"
+                                    onclick="return confirm('Bạn có chắc chắn muốn xóa?');">Xóa</a>
+                            </td>
+
+                        </tr>
                         <?php endforeach; ?>
                     </tbody>
                 </table>
@@ -291,6 +324,10 @@ include __DIR__ . '/../src/partials/header.php';
             <!-- Hãng sản xuất -->
             <div class="container-fluid-fluid" id="hsx">
                 <h2 class="section-title bg-light p-2 rounded potta-one-regular">Danh Sách Hãng Sản Xuất</h2>
+                <!-- Hiển thị thông báo -->
+                <?php if (!empty($successHangSX)): ?>
+                <div class="alert alert-success alert-message"><?php echo htmlspecialchars($successHangSX); ?></div>
+                <?php endif; ?>
                 <div class="d-flex justify-content-between align-items-center mb-3">
                     <!-- Tìm kiếm -->
                     <div class="d-flex">
@@ -317,15 +354,18 @@ include __DIR__ . '/../src/partials/header.php';
                     </thead>
                     <tbody>
                         <?php foreach ($hsxList as $hsx): ?>
-                            <tr>
-                                <td class="text-center"><?php echo htmlspecialchars($hsx['MaHangSX']); ?></td>
-                                <td><?php echo htmlspecialchars($hsx['TenHang']); ?></td>
-                                <td><?php echo htmlspecialchars($hsx['QuocGia']); ?></td>
-                                <td>
-                                    <a href="#" class="btn btn-primary">Sửa</a>
-                                    <a href="#" class="btn btn-danger">Xóa</a>
-                                </td>
-                            </tr>
+                        <tr>
+                            <td class="text-center"><?php echo htmlspecialchars($hsx['MaHangSX']); ?></td>
+                            <td><?php echo htmlspecialchars($hsx['TenHang']); ?></td>
+                            <td><?php echo htmlspecialchars($hsx['QuocGia']); ?></td>
+                            <td>
+                                <a href="edit_hangsx.php?MaHangSX=<?php echo $hsx['MaHangSX']; ?>"
+                                    class="btn btn-primary">Sửa</a>
+                                <a href="delete_hangsx.php?MaHangSX=<?php echo $hsx['MaHangSX']; ?>"
+                                    class="btn btn-danger"
+                                    onclick="return confirm('Bạn có chắc chắn muốn xóa?');">Xóa</a>
+                            </td>
+                        </tr>
                         <?php endforeach; ?>
                     </tbody>
                 </table>
@@ -334,6 +374,10 @@ include __DIR__ . '/../src/partials/header.php';
             <!-- Khách hàng -->
             <div class="container-fluid-fluid" id="khachHang">
                 <h2 class="section-title bg-light p-2 rounded potta-one-regular">Danh Sách Khách Hàng</h2>
+                <!-- Hiển thị thông báo -->
+                <?php if (!empty($successKH)): ?>
+                <div class="alert alert-success alert-message"><?php echo htmlspecialchars($successKH); ?></div>
+                <?php endif; ?>
                 <div class="d-flex justify-content-between align-items-center mb-3">
                     <!-- Tìm kiếm -->
                     <div class="d-flex">
@@ -342,7 +386,13 @@ include __DIR__ . '/../src/partials/header.php';
                         <input type="text" id="TenKH" class="form-control me-2" placeholder="Tên khách hàng" />
                         <input type="text" id="SoDienThoai" class="form-control me-2" placeholder="Số điện thoại" />
                     </div>
+
+                    <!-- Thêm mới -->
+                    <div class="d-flex justify-content-end">
+                        <a href="add.php?id=formKH" id="khachHang" class="btn btn-primary">Thêm mới</a>
+                    </div>
                 </div>
+
 
                 <table class="table table-striped">
                     <thead class="thead-dark">
@@ -355,15 +405,18 @@ include __DIR__ . '/../src/partials/header.php';
                     </thead>
                     <tbody>
                         <?php foreach ($KHList as $KH): ?>
-                            <tr>
-                                <td class="text-center"><?php echo htmlspecialchars($KH['MaKH']); ?></td>
-                                <td><?php echo htmlspecialchars($KH['TenKH']); ?></td>
-                                <td><?php echo htmlspecialchars($KH['SoDienThoai']); ?></td>
-                                <td>
-                                    <a href="#" class="btn btn-primary">Sửa</a>
-                                    <a href="#" class="btn btn-danger">Xóa</a>
-                                </td>
-                            </tr>
+                        <tr>
+                            <td class="text-center"><?php echo htmlspecialchars($KH['MaKH']); ?></td>
+                            <td><?php echo htmlspecialchars($KH['TenKH']); ?></td>
+                            <td><?php echo htmlspecialchars($KH['SoDienThoai']); ?></td>
+                            <td>
+                                <a href="edit_khachHang.php?MaKH=<?php echo $KH['MaKH']; ?>"
+                                    class="btn btn-primary">Sửa</a>
+                                <a href="delete_khachHang.php?MaKH=<?php echo $KH['MaKH']; ?>" class="btn btn-danger"
+                                    onclick="return confirm('Bạn có chắc chắn muốn xóa khách hàng này?');">Xóa</a>
+                            </td>
+
+                        </tr>
                         <?php endforeach; ?>
                     </tbody>
                 </table>
@@ -373,6 +426,10 @@ include __DIR__ . '/../src/partials/header.php';
             <div class="account-info">
                 <div class="container-fluid" id="hoaDon">
                     <h2 class="section-title bg-light p-2 rounded potta-one-regular ">Hóa Đơn</h2>
+                    <!-- Hiển thị thông báo -->
+                    <?php if (!empty($successHD)): ?>
+                    <div class="alert alert-success alert-message"><?php echo htmlspecialchars($successHD); ?></div>
+                    <?php endif; ?>
                     <div class="d-flex justify-content-between align-items-center mb-3">
                         <!-- Tìm kiếm -->
                         <div class="d-flex">
@@ -385,7 +442,7 @@ include __DIR__ . '/../src/partials/header.php';
 
                         <!-- Thêm mới -->
                         <div class="d-flex justify-content-end">
-                            <a href="add.php?id=hoaDon" id="HoaDon" class="btn btn-primary">Thêm mới</a>
+                            <a href="add.php?id=formHD" id="HoaDon" class="btn btn-primary">Thêm mới</a>
                         </div>
                     </div>
                     <table class="table table-striped">
@@ -402,183 +459,267 @@ include __DIR__ . '/../src/partials/header.php';
                         </thead>
                         <tbody>
                             <?php foreach ($hoadonList as $hoadon): ?>
-                                <tr>
-                                    <td><?php echo htmlspecialchars($hoadon['MaHD']); ?></td>
-                                    <td><?php echo htmlspecialchars($hoadon['TenKH']); ?></td>
-                                    <td><?php echo htmlspecialchars($hoadon['SoDienThoai']); ?></td>
-                                    <td><?php echo htmlspecialchars($hoadon['NgayLap']); ?></td>
-                                    <td><?php echo htmlspecialchars($hoadon['TongTien']); ?></td>
-                                    <td>Xem chi tiết</td>
-                                    <td>
-                                        <a href="#" class="btn btn-primary">Sửa</a>
-                                        <a href="#" class="btn btn-danger">Xóa</a>
-                                    </td>
-                                </tr>
+                            <tr>
+                                <td><?php echo htmlspecialchars($hoadon['MaHD']); ?></td>
+                                <td><?php echo htmlspecialchars($hoadon['TenKH']); ?></td>
+                                <td><?php echo htmlspecialchars($hoadon['SoDienThoai']); ?></td>
+                                <td><?php echo htmlspecialchars($hoadon['NgayLap']); ?></td>
+                                <td><?php echo htmlspecialchars($hoadon['TongTien']); ?></td>
+                                <td>
+                                    <a href="index.php?MaHD=<?php echo htmlspecialchars($hoadon['MaHD']); ?>"
+                                        class="btn btn-info">
+                                        Xem chi tiết
+                                    </a>
+                                </td>
+                                <td>
+                                    <a href="edit_hoadon.php?MaHD=<?php echo $hoadon['MaHD']; ?>"
+                                        class="btn btn-primary">Sửa</a>
+                                    <a href="delete_hoadon.php?MaHD=<?php echo $hoadon['MaHD']; ?>"
+                                        class="btn btn-danger"
+                                        onclick="return confirm('Bạn có chắc chắn muốn xóa hóa đơn này?');">Xóa</a>
+                                </td>
+
+                            </tr>
                             <?php endforeach; ?>
                         </tbody>
                     </table>
-                </div>
-            </div>
-
-            <!-- Nhân viên -->
-            <div class="account-info">
-                <div class="container-fluid" id="nhanVien">
-                    <h2 class="section-title bg-light p-2 rounded potta-one-regular ">Nhân viên</h2>
-                    <div class="d-flex justify-content-between align-items-center mb-3">
-                        <!-- Tìm kiếm -->
-                        <div class="d-flex">
-                            <button id="searchBtn" class="btn btn-primary me-2">Tìm kiếm</button>
-                            <input type="text" id="MaND" class="form-control me-2" placeholder="Mã nhân viên" />
-                            <input type="text" id="HoTen" class="form-control me-2" placeholder="Họ và Tên" />
-                            <input type="text" id="TenDangNhap" class="form-control me-2" placeholder="Tên đăng nhập" />
-                            <input type="text" id="Email" class="form-control me-2" placeholder="Email" />
-                            <input type="text" id="SoDienThoai" class="form-control me-2" placeholder="Số điện thoại" />
-                            <input type="text" id="VaiTro" class="form-control me-2" placeholder="Vai trò" />
-                            <input type="text" id="TrangThai" class="form-control me-2" placeholder="Trạng thái" />
-                        </div>
-
-                        <!-- Thêm mới -->
-                        <div class="d-flex justify-content-end">
-                            <a href="add.php?id=formNhanVien" id="NhanVien" class="btn btn-primary">Thêm mới</a>
-                        </div>
-                    </div>
-                    <table class="table table-striped">
-                        <thead class="thead-dark">
+                    <?php if (!empty($chiTietHD)): ?>
+                    <h3 class="mt-4">Chi Tiết Hóa Đơn #<?php echo htmlspecialchars($maHD); ?></h3>
+                    <table class="table table-bordered">
+                        <thead>
                             <tr>
-                                <th>Mã Nhân Viên</th>
-                                <th>Họ và Tên</th>
-                                <th>Số Điện Thoại</th>
-                                <th>Tên đăng nhập</th>
-                                <th>Email</th>
-                                <th>Vai trò</th>
-                                <th>Trạng thái</th>
-                                <th>Hành động</th>
+                                <th>Mã Thuốc</th>
+                                <th>Tên Thuốc</th>
+                                <th>Số Lượng</th>
+                                <th>Giá Bán</th>
+                                <th>Thành Tiền</th>
                             </tr>
                         </thead>
                         <tbody>
-                            <?php foreach ($nvList as $nv): ?>
-                                <tr>
-                                    <td><?php echo htmlspecialchars($nv['MaND']); ?></td>
-                                    <td><?php echo htmlspecialchars($nv['HoTen']); ?></td>
-                                    <td><?php echo htmlspecialchars($nv['TenDangNhap']); ?></td>
-                                    <td><?php echo htmlspecialchars($nv['Email']); ?></td>
-                                    <td><?php echo htmlspecialchars($nv['SoDienThoai']); ?></td>
-                                    <td><?php echo htmlspecialchars($nv['VaiTro']); ?></td>
-                                    <td><?php echo htmlspecialchars($nv['TrangThai']); ?></td>
-                                    <td>
-                                        <a href="#" class="btn btn-primary">Sửa</a>
-                                        <a href="#" class="btn btn-danger">Xóa</a>
-                                    </td>
-                                </tr>
+                            <?php foreach ($chiTietHD as $ct): ?>
+                            <tr>
+                                <td><?php echo htmlspecialchars($ct['MaThuoc']); ?></td>
+                                <td><?php echo htmlspecialchars($ct['TenThuoc']); ?></td>
+                                <td><?php echo htmlspecialchars($ct['SoLuongBan']); ?></td>
+                                <td><?php echo number_format($ct['GiaBan'], 2); ?> VNĐ</td>
+                                <td><?php echo number_format($ct['ThanhTien'], 2); ?> VNĐ</td>
+                            </tr>
                             <?php endforeach; ?>
                         </tbody>
                     </table>
+                    <?php endif; ?>
+
                 </div>
             </div>
-
-            <!-- Thống kê danh thu -->
-            <!-- Báo cáo tồn kho -->
-            <!-- Nhập thuốc từ Excel -->
-            <!-- Xuất file Excel -->
         </div>
+
+        <!-- Nhân viên -->
+        <div class="account-info">
+            <div class="container-fluid" id="nhanVien">
+                <h2 class="section-title bg-light p-2 rounded potta-one-regular ">Nhân viên</h2>
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <!-- Tìm kiếm -->
+                    <div class="d-flex">
+                        <button id="searchBtn" class="btn btn-primary me-2">Tìm kiếm</button>
+                        <input type="text" id="MaND" class="form-control me-2" placeholder="Mã nhân viên" />
+                        <input type="text" id="HoTen" class="form-control me-2" placeholder="Họ và Tên" />
+                        <input type="text" id="TenDangNhap" class="form-control me-2" placeholder="Tên đăng nhập" />
+                        <input type="text" id="Email" class="form-control me-2" placeholder="Email" />
+                        <input type="text" id="SoDienThoai" class="form-control me-2" placeholder="Số điện thoại" />
+                        <input type="text" id="VaiTro" class="form-control me-2" placeholder="Vai trò" />
+                        <input type="text" id="TrangThai" class="form-control me-2" placeholder="Trạng thái" />
+                    </div>
+
+                    <!-- Thêm mới -->
+                    <div class="d-flex justify-content-end">
+                        <a href="add.php?id=formNhanVien" id="NhanVien" class="btn btn-primary">Thêm mới</a>
+                    </div>
+                </div>
+                <table class="table table-striped">
+                    <thead class="thead-dark">
+                        <tr>
+                            <th>Mã Nhân Viên</th>
+                            <th>Họ và Tên</th>
+                            <th>Số Điện Thoại</th>
+                            <th>Tên đăng nhập</th>
+                            <th>Email</th>
+                            <th>Vai trò</th>
+                            <th>Trạng thái</th>
+                            <th>Hành động</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php foreach ($nvList as $nv): ?>
+                        <tr>
+                            <td><?php echo htmlspecialchars($nv['MaND']); ?></td>
+                            <td><?php echo htmlspecialchars($nv['HoTen']); ?></td>
+                            <td><?php echo htmlspecialchars($nv['TenDangNhap']); ?></td>
+                            <td><?php echo htmlspecialchars($nv['Email']); ?></td>
+                            <td><?php echo htmlspecialchars($nv['SoDienThoai']); ?></td>
+                            <td><?php echo htmlspecialchars($nv['VaiTro']); ?></td>
+                            <td><?php echo htmlspecialchars($nv['TrangThai']); ?></td>
+                            <td>
+                                <a href="#" class="btn btn-primary">Sửa</a>
+                                <a href="#" class="btn btn-danger">Xóa</a>
+                            </td>
+                        </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Thống kê danh thu -->
+        <!-- Báo cáo tồn kho -->
+        <!-- Nhập thuốc từ Excel -->
+        <!-- Xuất file Excel -->
     </div>
+</div>
 </div>
 
 <?php if (!empty($success_message)): ?>
-    <div id="success-alert" class="alert alert-success text-center">
-        <?php echo htmlspecialchars($success_message); ?>
-    </div>
+<div id="success-alert" class="alert alert-success text-center">
+    <?php echo htmlspecialchars($success_message); ?>
+</div>
 
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script>
-        $(document).ready(function () {
-            setTimeout(function () {
-                $("#success-alert").fadeOut(500);
-            }, 5000);
-        });
-    </script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+$(document).ready(function() {
+    setTimeout(function() {
+        $("#success-alert").fadeOut(500);
+    }, 5000);
+});
+</script>
 <?php endif; ?>
 
 <script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const menuItems = [
-            { linkId: 'showThuoc', sectionId: 'thuoc' },
-            { linkId: 'showLoai', sectionId: 'loai' },
-            { linkId: 'showHoadon', sectionId: 'hoaDon' },
-            { linkId: 'showThongKe', sectionId: 'thongKe' },
-            { linkId: 'showTonKho', sectionId: 'tonKho' },
-            { linkId: 'showNCC', sectionId: 'ncc' },
-            { linkId: 'showHSX', sectionId: 'hsx' },
-            { linkId: 'showNhapThuoc', sectionId: 'nhapThuoc' },
-            { linkId: 'showKhachHang', sectionId: 'khachHang' },
-            { linkId: 'showXuatFile', sectionId: 'xuatFile' },
-            { linkId: 'showNhanVien', sectionId: 'nhanVien' }
-        ];
-
-        function hideAllSections() {
-            menuItems.forEach(item => {
-                const section = document.getElementById(item.sectionId);
-                if (section) {
-                    section.style.display = 'none';
-                }
-            });
+document.addEventListener('DOMContentLoaded', function() {
+    const menuItems = [{
+            linkId: 'showThuoc',
+            sectionId: 'thuoc'
+        },
+        {
+            linkId: 'showLoai',
+            sectionId: 'loai'
+        },
+        {
+            linkId: 'showHoadon',
+            sectionId: 'hoaDon'
+        },
+        {
+            linkId: 'showThongKe',
+            sectionId: 'thongKe'
+        },
+        {
+            linkId: 'showTonKho',
+            sectionId: 'tonKho'
+        },
+        {
+            linkId: 'showNCC',
+            sectionId: 'ncc'
+        },
+        {
+            linkId: 'showHSX',
+            sectionId: 'hsx'
+        },
+        {
+            linkId: 'showNhapThuoc',
+            sectionId: 'nhapThuoc'
+        },
+        {
+            linkId: 'showKhachHang',
+            sectionId: 'khachHang'
+        },
+        {
+            linkId: 'showXuatFile',
+            sectionId: 'xuatFile'
+        },
+        {
+            linkId: 'showNhanVien',
+            sectionId: 'nhanVien'
         }
+    ];
 
-        function removeActiveClass() {
-            menuItems.forEach(item => {
-                const link = document.getElementById(item.linkId);
-                if (link) {
-                    link.classList.remove('active');
-                }
-            });
-        }
-
-        function showSection(sectionId, linkId) {
-            hideAllSections();
-            removeActiveClass();
-
-            const section = document.getElementById(sectionId);
-            const link = document.getElementById(linkId);
-
+    function hideAllSections() {
+        menuItems.forEach(item => {
+            const section = document.getElementById(item.sectionId);
             if (section) {
-                section.style.display = 'block';
+                section.style.display = 'none';
             }
-            if (link) {
-                link.classList.add('active');
-            }
-        }
+        });
+    }
 
-        // Ẩn tất cả sections trước
-        hideAllSections();
-
-        // Hiển thị mặc định phần "thuoc" và đánh dấu menu active
-        showSection('thuoc', 'showThuoc');
-
+    function removeActiveClass() {
         menuItems.forEach(item => {
             const link = document.getElementById(item.linkId);
             if (link) {
-                link.addEventListener('click', function (e) {
-                    e.preventDefault();
-                    showSection(item.sectionId, item.linkId);
-                });
+                link.classList.remove('active');
             }
         });
+    }
+
+    function showSection(sectionId, linkId) {
+        hideAllSections();
+        removeActiveClass();
+
+        const section = document.getElementById(sectionId);
+        const link = document.getElementById(linkId);
+
+        if (section) {
+            section.style.display = 'block';
+        }
+        if (link) {
+            link.classList.add('active');
+        }
+    }
+
+    // Ẩn tất cả sections trước
+    hideAllSections();
+
+    // Hiển thị mặc định phần "thuoc" và đánh dấu menu active
+    showSection('thuoc', 'showThuoc');
+
+    menuItems.forEach(item => {
+        const link = document.getElementById(item.linkId);
+        if (link) {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                showSection(item.sectionId, item.linkId);
+            });
+        }
     });
+});
 </script>
 
 <script>
-    // Hiển thị thông báo đăng nhập thành công nếu có
-    document.addEventListener('DOMContentLoaded', function () {
-        <?php if (!empty($successMessage)): ?>
-            Swal.fire({
-                title: "Đăng nhập thành công!",
-                text: "<?php echo htmlspecialchars($successMessage); ?>",
-                icon: "success",
-                confirmButtonText: "OK"
-            });
-        <?php endif; ?>
+// Hiển thị thông báo đăng nhập thành công nếu có
+document.addEventListener('DOMContentLoaded', function() {
+    <?php if (!empty($successMessage)): ?>
+    Swal.fire({
+        title: "Đăng nhập thành công!",
+        text: "<?php echo htmlspecialchars($successMessage); ?>",
+        icon: "success",
+        confirmButtonText: "OK"
     });
+    <?php endif; ?>
+});
 </script>
+<script>
+// Tự động ẩn thông báo sau 5 giây
+setTimeout(function() {
+    let alerts = document.querySelectorAll(".alert-message");
+
+    alerts.forEach(function(alert) {
+        alert.style.transition = "opacity 0.5s";
+        alert.style.opacity = "0";
+        setTimeout(() => alert.style.display = "none", 500);
+    });
+}, 5000); // 5000ms = 5 giây
+</script>
+
+
+
+
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
