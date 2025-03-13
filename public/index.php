@@ -267,50 +267,18 @@ include __DIR__ . '/../src/partials/header.php';
 <!-- Show -->
 <script>
     document.addEventListener('DOMContentLoaded', function () {
-        const menuItems = [{
-            linkId: 'showThuoc',
-            sectionId: 'thuoc'
-        },
-        {
-            linkId: 'showLoai',
-            sectionId: 'loai'
-        },
-        {
-            linkId: 'showHoadon',
-            sectionId: 'hoaDon'
-        },
-        {
-            linkId: 'showThongKe',
-            sectionId: 'thongKe'
-        },
-        {
-            linkId: 'showTonKho',
-            sectionId: 'tonKho'
-        },
-        {
-            linkId: 'showNCC',
-            sectionId: 'ncc'
-        },
-        {
-            linkId: 'showHSX',
-            sectionId: 'hsx'
-        },
-        {
-            linkId: 'showNhapThuoc',
-            sectionId: 'nhapThuoc'
-        },
-        {
-            linkId: 'showKhachHang',
-            sectionId: 'khachHang'
-        },
-        {
-            linkId: 'showXuatFile',
-            sectionId: 'xuatFile'
-        },
-        {
-            linkId: 'showNhanVien',
-            sectionId: 'nhanVien'
-        }
+        const menuItems = [
+            { linkId: 'showThuoc', sectionId: 'thuoc' },
+            { linkId: 'showLoai', sectionId: 'loai' },
+            { linkId: 'showHoadon', sectionId: 'hoaDon' },
+            { linkId: 'showThongKe', sectionId: 'thongKe' },
+            { linkId: 'showTonKho', sectionId: 'tonKho' },
+            { linkId: 'showNCC', sectionId: 'ncc' },
+            { linkId: 'showHSX', sectionId: 'hsx' },
+            { linkId: 'showNhapThuoc', sectionId: 'nhapThuoc' },
+            { linkId: 'showKhachHang', sectionId: 'khachHang' },
+            { linkId: 'showXuatFile', sectionId: 'xuatFile' },
+            { linkId: 'showNhanVien', sectionId: 'nhanVien' }
         ];
 
         function hideAllSections() {
@@ -344,13 +312,29 @@ include __DIR__ . '/../src/partials/header.php';
             if (link) {
                 link.classList.add('active');
             }
+
+            // Lưu ID tab vào LocalStorage
+            localStorage.setItem("activeTab", sectionId);
+            localStorage.setItem("activeLink", linkId);
+
+            // Cập nhật URL chỉ còn "index.php"
+            history.replaceState(null, "", "index.php");
         }
 
         // Ẩn tất cả sections trước
         hideAllSections();
 
-        // Hiển thị mặc định phần "thuoc" và đánh dấu menu active
-        showSection('thuoc', 'showThuoc');
+        // Lấy tab & menu sidebar active từ LocalStorage
+        const savedTab = localStorage.getItem("activeTab");
+        const savedLink = localStorage.getItem("activeLink");
+
+        // Nếu có tab được lưu => Hiển thị tab đó + active menu
+        if (savedTab && document.getElementById(savedTab) && savedLink && document.getElementById(savedLink)) {
+            showSection(savedTab, savedLink);
+        } else {
+            // Nếu không có tab nào lưu, mặc định mở tab "thuốc"
+            showSection('thuoc', 'showThuoc');
+        }
 
         menuItems.forEach(item => {
             const link = document.getElementById(item.linkId);
@@ -378,7 +362,7 @@ include __DIR__ . '/../src/partials/header.php';
     });
 </script>
 <script>
-    // Tự động ẩn thông báo sau 5 giây
+    // Tự động ẩn thông báo sau 1 giây
     setTimeout(function () {
         let alerts = document.querySelectorAll(".alert-message");
 
@@ -387,12 +371,8 @@ include __DIR__ . '/../src/partials/header.php';
             alert.style.opacity = "0";
             setTimeout(() => alert.style.display = "none", 500);
         });
-    }, 5000); // 5000ms = 5 giây
+    }, 1000); // 1000ms = 1 giây
 </script>
-
-
-
-
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
