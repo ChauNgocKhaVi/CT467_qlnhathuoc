@@ -1,17 +1,18 @@
 -- Thông báo thuốc sắp hết hạn
 DELIMITER $$
+
 CREATE TRIGGER canh_bao_thuoc_het_han
-BEFORE UPDATE ON Thuoc
+AFTER UPDATE ON Thuoc
 FOR EACH ROW
 BEGIN
+    -- Nếu thuốc sắp hết hạn trong vòng 30 ngày
     IF NEW.HanSuDung <= DATE_ADD(CURDATE(), INTERVAL 30 DAY) THEN
-        SET NEW.ThuocSapHetHan = 1;
-    ELSE
-        SET NEW.ThuocSapHetHan = 0;
+        INSERT INTO ThongBao (MaThuoc, NoiDung)
+        VALUES (NEW.MaThuoc, CONCAT('Thuốc "', NEW.TenThuoc, '" sắp hết hạn vào ngày ', NEW.HanSuDung));
     END IF;
 END $$
-DELIMITER ;
 
+DELIMITER ;
 
 -- Tự động cập nhật số lượng khi thêm thuốc vào kho
 DELIMITER $$

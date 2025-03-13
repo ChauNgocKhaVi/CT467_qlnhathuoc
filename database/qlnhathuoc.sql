@@ -75,6 +75,16 @@ CREATE TABLE ChiTietHoaDon (
     FOREIGN KEY (MaThuoc) REFERENCES Thuoc(MaThuoc) ON DELETE CASCADE
 );
 
+-- Bảng thông báo thuốc sắp hết hạn
+CREATE TABLE ThongBao (
+    MaThongBao INT AUTO_INCREMENT PRIMARY KEY,
+    MaThuoc INT NOT NULL,
+    ThoiGianThongBao TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    NoiDung TEXT NOT NULL,
+    TrangThai ENUM('chua_xem', 'da_xem') DEFAULT 'chua_xem',
+    FOREIGN KEY (MaThuoc) REFERENCES Thuoc(MaThuoc) ON DELETE CASCADE
+);
+
 
 
 
