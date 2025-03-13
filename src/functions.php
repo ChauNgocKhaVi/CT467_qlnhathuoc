@@ -232,4 +232,63 @@ function layTatCaNhanVien(PDO $pdo): array
     $stmt = $pdo->query($query);
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
+
+// --------------------- THÊM ---------------------
+
+//Thêm thuốc
+function themThuoc(PDO $pdo, $maLoai, $maHangSX, $maNCC, $tenThuoc, $donGia, $soLuongTon, $hanSuDung)
+{
+    $query = "INSERT INTO Thuoc (MaLoai, MaHangSX, MaNCC, TenThuoc, DonGia, SoLuongTon, HanSuDung) 
+            VALUES (:maLoai, :maHangSX, :maNCC, :tenThuoc, :donGia, :soLuongTon, :hanSuDung)";
+    $stmt = $pdo->prepare($query);
+
+    $stmt->bindParam(':maLoai', $maLoai, PDO::PARAM_INT);
+    $stmt->bindParam(':maHangSX', $maHangSX, PDO::PARAM_INT);
+    $stmt->bindParam(':maNCC', $maNCC, PDO::PARAM_INT);
+    $stmt->bindParam(':tenThuoc', $tenThuoc, PDO::PARAM_STR);
+    $stmt->bindParam(':donGia', $donGia, PDO::PARAM_STR);
+    $stmt->bindParam(':soLuongTon', $soLuongTon, PDO::PARAM_INT);
+    $stmt->bindParam(':hanSuDung', $hanSuDung, PDO::PARAM_STR);
+
+    return $stmt->execute();
+}
+
+// Thêm nhân viên
+function themNhanVien(PDO $pdo, $hoTen, $tenDangNhap, $email, $matKhau, $soDienThoai, $vaiTro, $trangThai)
+{
+    // Kiểm tra xem tên đăng nhập hoặc email đã tồn tại chưa
+    $checkQuery = "SELECT COUNT(*) FROM Admin WHERE TenDangNhap = :tenDangNhap OR Email = :email";
+    $checkStmt = $pdo->prepare($checkQuery);
+    $checkStmt->bindParam(':tenDangNhap', $tenDangNhap, PDO::PARAM_STR);
+    $checkStmt->bindParam(':email', $email, PDO::PARAM_STR);
+    $checkStmt->execute();
+    $exists = $checkStmt->fetchColumn();
+
+    if ($exists > 0) {
+        return "Tên đăng nhập hoặc email đã tồn tại!";
+    }
+
+    // Hash mật khẩu trước khi lưu
+    $hashedPassword = password_hash($matKhau, PASSWORD_BCRYPT);
+
+    // Thực hiện thêm nhân viên
+    $query = "INSERT INTO Admin (HoTen, TenDangNhap, MatKhau, Email, SoDienThoai, VaiTro, TrangThai) 
+            VALUES (:hoTen, :tenDangNhap, :matKhau, :email, :soDienThoai, :vaiTro, :trangThai)";
+
+    $stmt = $pdo->prepare($query);
+    $stmt->bindParam(':hoTen', $hoTen, PDO::PARAM_STR);
+    $stmt->bindParam(':tenDangNhap', $tenDangNhap, PDO::PARAM_STR);
+    $stmt->bindParam(':matKhau', $hashedPassword, PDO::PARAM_STR);
+    $stmt->bindParam(':email', $email, PDO::PARAM_STR);
+    $stmt->bindParam(':soDienThoai', $soDienThoai, PDO::PARAM_STR);
+    $stmt->bindParam(':vaiTro', $vaiTro, PDO::PARAM_STR);
+    $stmt->bindParam(':trangThai', $trangThai, PDO::PARAM_STR);
+
+    if ($stmt->execute()) {
+        return true; // Thành công
+    } else {
+        return "Thêm nhân viên thất bại!";
+    }
+}
+
 ?>
