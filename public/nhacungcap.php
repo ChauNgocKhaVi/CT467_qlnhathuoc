@@ -1,5 +1,10 @@
+<!-- Nhà cung cấp -->
 <div class="container-fluid-fluid" id="ncc">
     <h2 class="section-title bg-light p-2 rounded potta-one-regular">Danh Sách Nhà Cung Cấp</h2>
+    <!-- Hiển thị thông báo -->
+    <?php if (!empty($successNCC)): ?>
+        <div class="alert alert-success alert-message"><?php echo htmlspecialchars($successNCC); ?></div>
+    <?php endif; ?>
     <div class="d-flex justify-content-between align-items-center mb-3">
         <!-- Tìm kiếm -->
         <div class="d-flex">
@@ -20,7 +25,7 @@
             <tr>
                 <th class="text-center">Mã Nhà Cung Cấp</th>
                 <th>Tên Nhà Cung Cấp</th>
-                <th>Số Điện Thoại/th>
+                <th>Số Điện Thoại</th>
                 <th>Hành động</th>
             </tr>
         </thead>
@@ -31,9 +36,11 @@
                     <td><?php echo htmlspecialchars($ncc['TenNCC']); ?></td>
                     <td><?php echo htmlspecialchars($ncc['SoDienThoai']); ?></td>
                     <td>
-                        <a href="#" class="btn btn-primary">Sửa</a>
-                        <a href="#" class="btn btn-danger">Xóa</a>
+                        <a href="edit_ncc.php?MaNCC=<?php echo $ncc['MaNCC']; ?>" class="btn btn-primary">Sửa</a>
+                        <a href="delete_ncc.php?MaNCC=<?php echo $ncc['MaNCC']; ?>" class="btn btn-danger"
+                            onclick="return confirm('Bạn có chắc chắn muốn xóa?');">Xóa</a>
                     </td>
+
                 </tr>
             <?php endforeach; ?>
         </tbody>

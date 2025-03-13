@@ -1,5 +1,10 @@
+<!-- Loại thuốc -->
 <div class="container-fluid-fluid" id="loai">
     <h2 class="section-title bg-light p-2 rounded potta-one-regular">Danh Sách Loại</h2>
+    <!-- Hiển thị thông báo -->
+    <?php if (!empty($successLoai)): ?>
+        <div class="alert alert-success alert-message"><?php echo htmlspecialchars($successLoai); ?></div>
+    <?php endif; ?>
     <div class="d-flex justify-content-between align-items-center mb-3">
         <!-- Tìm kiếm -->
         <div class="d-flex">
@@ -31,9 +36,11 @@
                     <td><?php echo htmlspecialchars($loai['TenLoai']); ?></td>
                     <td><?php echo htmlspecialchars($loai['DonViTinh']); ?></td>
                     <td>
-                        <a href="#" class="btn btn-primary">Sửa</a>
-                        <a href="#" class="btn btn-danger">Xóa</a>
+                        <a href="edit_loai.php?MaLoai=<?php echo $loai['MaLoai']; ?>" class="btn btn-primary">Sửa</a>
+                        <a href="delete_loai.php?MaLoai=<?php echo $loai['MaLoai']; ?>" class="btn btn-danger"
+                            onclick="return confirm('Bạn có chắc chắn muốn xóa?');">Xóa</a>
                     </td>
+
                 </tr>
             <?php endforeach; ?>
         </tbody>

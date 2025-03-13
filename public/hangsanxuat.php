@@ -1,5 +1,10 @@
+<!-- Hãng sản xuất -->
 <div class="container-fluid-fluid" id="hsx">
     <h2 class="section-title bg-light p-2 rounded potta-one-regular">Danh Sách Hãng Sản Xuất</h2>
+    <!-- Hiển thị thông báo -->
+    <?php if (!empty($successHangSX)): ?>
+        <div class="alert alert-success alert-message"><?php echo htmlspecialchars($successHangSX); ?></div>
+    <?php endif; ?>
     <div class="d-flex justify-content-between align-items-center mb-3">
         <!-- Tìm kiếm -->
         <div class="d-flex">
@@ -31,8 +36,9 @@
                     <td><?php echo htmlspecialchars($hsx['TenHang']); ?></td>
                     <td><?php echo htmlspecialchars($hsx['QuocGia']); ?></td>
                     <td>
-                        <a href="#" class="btn btn-primary">Sửa</a>
-                        <a href="#" class="btn btn-danger">Xóa</a>
+                        <a href="edit_hangsx.php?MaHangSX=<?php echo $hsx['MaHangSX']; ?>" class="btn btn-primary">Sửa</a>
+                        <a href="delete_hangsx.php?MaHangSX=<?php echo $hsx['MaHangSX']; ?>" class="btn btn-danger"
+                            onclick="return confirm('Bạn có chắc chắn muốn xóa?');">Xóa</a>
                     </td>
                 </tr>
             <?php endforeach; ?>

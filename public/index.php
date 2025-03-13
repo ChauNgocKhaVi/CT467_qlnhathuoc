@@ -104,7 +104,6 @@ include __DIR__ . '/../src/partials/header.php';
         width: 150px;
     }
 
-
     #searchBtn {
         height: 35px;
         margin-top: 6px;
@@ -188,8 +187,10 @@ include __DIR__ . '/../src/partials/header.php';
                         <a class="nav-link" href="#thuoc" id="showThuoc"><strong>Quản lý thuốc</strong></a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#loai" id="showLoai"><strong>Quản lý loại thuốc</strong></a>
+                        <a class="nav-link" href="index.php?tab=loai" id="showLoai"><strong>Quản lý loại
+                                thuốc</strong></a>
                     </li>
+
                     <li class="nav-item">
                         <a class="nav-link" href="#ncc" id="showNCC"><strong>Quản lý nhà cung cấp</strong></a>
                     </li>
@@ -209,7 +210,8 @@ include __DIR__ . '/../src/partials/header.php';
                         <a class="nav-link" href="#tonKho" id="showTonKho"><strong>Báo cáo tồn kho</strong></a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#nhapThuoc" id="showNhapThuoc"><strong>Nhập thuốc từ Excel</strong></a>
+                        <a class="nav-link" href="#nhapThuoc" id="showNhapThuoc"><strong>Nhập thuốc từ
+                                Excel</strong></a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="#xuatFile" id="showXuatFile"><strong>Xuất file </strong></a>
@@ -237,8 +239,11 @@ include __DIR__ . '/../src/partials/header.php';
             ?>
 
             <!-- Thống kê danh thu -->
+
             <!-- Báo cáo tồn kho -->
+
             <!-- Nhập thuốc từ Excel -->
+
             <!-- Xuất file Excel -->
         </div>
     </div>
@@ -384,6 +389,10 @@ include __DIR__ . '/../src/partials/header.php';
         });
     }, 5000); // 5000ms = 5 giây
 </script>
+
+
+
+
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 

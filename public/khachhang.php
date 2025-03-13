@@ -1,5 +1,10 @@
+<!-- Khách hàng -->
 <div class="container-fluid-fluid" id="khachHang">
     <h2 class="section-title bg-light p-2 rounded potta-one-regular">Danh Sách Khách Hàng</h2>
+    <!-- Hiển thị thông báo -->
+    <?php if (!empty($successKH)): ?>
+        <div class="alert alert-success alert-message"><?php echo htmlspecialchars($successKH); ?></div>
+    <?php endif; ?>
     <div class="d-flex justify-content-between align-items-center mb-3">
         <!-- Tìm kiếm -->
         <div class="d-flex">
@@ -8,7 +13,13 @@
             <input type="text" id="TenKH" class="form-control me-2" placeholder="Tên khách hàng" />
             <input type="text" id="SoDienThoai" class="form-control me-2" placeholder="Số điện thoại" />
         </div>
+
+        <!-- Thêm mới -->
+        <div class="d-flex justify-content-end">
+            <a href="add.php?id=formKH" id="khachHang" class="btn btn-primary">Thêm mới</a>
+        </div>
     </div>
+
 
     <table class="table table-striped">
         <thead class="thead-dark">
@@ -26,9 +37,11 @@
                     <td><?php echo htmlspecialchars($KH['TenKH']); ?></td>
                     <td><?php echo htmlspecialchars($KH['SoDienThoai']); ?></td>
                     <td>
-                        <a href="#" class="btn btn-primary">Sửa</a>
-                        <a href="#" class="btn btn-danger">Xóa</a>
+                        <a href="edit_khachHang.php?MaKH=<?php echo $KH['MaKH']; ?>" class="btn btn-primary">Sửa</a>
+                        <a href="delete_khachHang.php?MaKH=<?php echo $KH['MaKH']; ?>" class="btn btn-danger"
+                            onclick="return confirm('Bạn có chắc chắn muốn xóa khách hàng này?');">Xóa</a>
                     </td>
+
                 </tr>
             <?php endforeach; ?>
         </tbody>
