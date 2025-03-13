@@ -74,23 +74,17 @@ CREATE PROCEDURE DangKy(
     OUT p_KetQua VARCHAR(255)
 )
 BEGIN
-    -- Không cần kiểm tra trùng lặp, vì Trigger đã làm điều đó
-
     -- Bắt đầu Transaction để đảm bảo tính toàn vẹn dữ liệu
     START TRANSACTION;
-    
     -- Thêm tài khoản với mật khẩu đã hash từ PHP
     INSERT INTO Admin (HoTen, TenDangNhap, MatKhau, Email, SoDienThoai, VaiTro, TrangThai)
     VALUES (p_HoTen, p_TenDangNhap, p_HashedMatKhau, p_Email, p_SoDienThoai, 'nhanvien', 'active');
-
     -- Xác nhận Transaction
     COMMIT;
-
     SET p_KetQua = 'Đăng ký thành công!';
 END$$
 
 DELIMITER ;
-
 
 
 -- Đăng nhập
