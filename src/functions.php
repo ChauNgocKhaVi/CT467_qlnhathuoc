@@ -182,6 +182,22 @@ function layHoaDonBanThuoc(PDO $pdo): array
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
 
+// --------------------- LẤY CHI TIẾT HÓA ĐƠN BÁN THUỐC ---------------------
+function layChiTietHoaDon($pdo, $maHD)
+{
+    $stmt = $pdo->prepare("
+        SELECT cthd.MaThuoc, t.TenThuoc, cthd.SoLuongBan, cthd.GiaBan, 
+               (cthd.SoLuongBan * cthd.GiaBan) AS ThanhTien
+        FROM ChiTietHoaDon cthd
+        JOIN Thuoc t ON cthd.MaThuoc = t.MaThuoc
+        WHERE cthd.MaHD = :maHD
+    ");
+    $stmt->execute(['maHD' => $maHD]);
+    return $stmt->fetchAll();
+}
+
+
+
 // --------------------- LẤY LOẠI THUỐC ---------------------
 
 // Lấy danh sách tất cả thể loại thuốc
@@ -290,5 +306,4 @@ function themNhanVien(PDO $pdo, $hoTen, $tenDangNhap, $email, $matKhau, $soDienT
         return "Thêm nhân viên thất bại!";
     }
 }
-
 ?>

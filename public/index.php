@@ -21,6 +21,20 @@ $KHList = layTatCaKhachHang($pdo); // Gọi hàm lấy danh sách khách hàng
 $hoadonList = layHoaDonBanThuoc($pdo); // Gọi hàm lấy danh sách hóa đơn
 $nvList = layTatCaNhanVien($pdo); // Gọi hàm lấy danh sách nhân viên
 
+$chiTietHD = [];
+$maHD = '';
+
+if (isset($_GET['MaHD']) && !empty($_GET['MaHD'])) {
+    $maHD = $_GET['MaHD'];
+    $chiTietHD = layChiTietHoaDon($pdo, $maHD);
+}
+
+$successLoai = $_GET['successLoai'] ?? ''; // Lấy thông báo thành công
+$successNCC = $_GET['successNCC'] ?? ''; // Lấy thông báo thành công
+$successHangSX = $_GET['successHangSX'] ?? ''; // Lấy thông báo thành công
+$successKH = $_GET['successKH'] ?? ''; // Lấy thông báo thành công
+$successHD = $_GET['successHD'] ?? ''; // Lấy thông báo thành công
+
 include __DIR__ . '/../src/partials/head.php';
 include __DIR__ . '/../src/partials/header.php';
 ?>
@@ -90,6 +104,7 @@ include __DIR__ . '/../src/partials/header.php';
         width: 150px;
     }
 
+
     #searchBtn {
         height: 35px;
         margin-top: 6px;
@@ -152,6 +167,12 @@ include __DIR__ . '/../src/partials/header.php';
         background-color: #007bff;
         color: white;
     }
+
+    #searchBtn {
+        height: 35px;
+        margin-top: 6px;
+        /* Điều chỉnh cho phù hợp */
+    }
 </style>
 
 <div class="container-fluid">
@@ -188,8 +209,7 @@ include __DIR__ . '/../src/partials/header.php';
                         <a class="nav-link" href="#tonKho" id="showTonKho"><strong>Báo cáo tồn kho</strong></a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#nhapThuoc" id="showNhapThuoc"><strong>Nhập thuốc từ
-                                Excel</strong></a>
+                        <a class="nav-link" href="#nhapThuoc" id="showNhapThuoc"><strong>Nhập thuốc từ Excel</strong></a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="#xuatFile" id="showXuatFile"><strong>Xuất file </strong></a>
@@ -215,14 +235,11 @@ include __DIR__ . '/../src/partials/header.php';
             include __DIR__ . '/hoadon.php';
             include __DIR__ . '/nhanvien.php';
             ?>
+
             <!-- Thống kê danh thu -->
-
             <!-- Báo cáo tồn kho -->
-
             <!-- Nhập thuốc từ Excel -->
-
             <!-- Xuất file Excel -->
-
         </div>
     </div>
 </div>
@@ -245,18 +262,50 @@ include __DIR__ . '/../src/partials/header.php';
 <!-- Show -->
 <script>
     document.addEventListener('DOMContentLoaded', function () {
-        const menuItems = [
-            { linkId: 'showThuoc', sectionId: 'thuoc' },
-            { linkId: 'showLoai', sectionId: 'loai' },
-            { linkId: 'showHoadon', sectionId: 'hoaDon' },
-            { linkId: 'showThongKe', sectionId: 'thongKe' },
-            { linkId: 'showTonKho', sectionId: 'tonKho' },
-            { linkId: 'showNCC', sectionId: 'ncc' },
-            { linkId: 'showHSX', sectionId: 'hsx' },
-            { linkId: 'showNhapThuoc', sectionId: 'nhapThuoc' },
-            { linkId: 'showKhachHang', sectionId: 'khachHang' },
-            { linkId: 'showXuatFile', sectionId: 'xuatFile' },
-            { linkId: 'showNhanVien', sectionId: 'nhanVien' }
+        const menuItems = [{
+            linkId: 'showThuoc',
+            sectionId: 'thuoc'
+        },
+        {
+            linkId: 'showLoai',
+            sectionId: 'loai'
+        },
+        {
+            linkId: 'showHoadon',
+            sectionId: 'hoaDon'
+        },
+        {
+            linkId: 'showThongKe',
+            sectionId: 'thongKe'
+        },
+        {
+            linkId: 'showTonKho',
+            sectionId: 'tonKho'
+        },
+        {
+            linkId: 'showNCC',
+            sectionId: 'ncc'
+        },
+        {
+            linkId: 'showHSX',
+            sectionId: 'hsx'
+        },
+        {
+            linkId: 'showNhapThuoc',
+            sectionId: 'nhapThuoc'
+        },
+        {
+            linkId: 'showKhachHang',
+            sectionId: 'khachHang'
+        },
+        {
+            linkId: 'showXuatFile',
+            sectionId: 'xuatFile'
+        },
+        {
+            linkId: 'showNhanVien',
+            sectionId: 'nhanVien'
+        }
         ];
 
         function hideAllSections() {
@@ -322,6 +371,18 @@ include __DIR__ . '/../src/partials/header.php';
             });
         <?php endif; ?>
     });
+</script>
+<script>
+    // Tự động ẩn thông báo sau 5 giây
+    setTimeout(function () {
+        let alerts = document.querySelectorAll(".alert-message");
+
+        alerts.forEach(function (alert) {
+            alert.style.transition = "opacity 0.5s";
+            alert.style.opacity = "0";
+            setTimeout(() => alert.style.display = "none", 500);
+        });
+    }, 5000); // 5000ms = 5 giây
 </script>
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
