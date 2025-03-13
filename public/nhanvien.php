@@ -60,20 +60,20 @@
         <table class="table table-striped">
             <thead class="thead-dark">
                 <tr>
-                    <th>Mã Nhân Viên</th>
+                    <th class="text-center">Mã Nhân Viên</th>
                     <th>Họ và Tên</th>
                     <th>Số Điện Thoại</th>
                     <th>Tên đăng nhập</th>
                     <th>Email</th>
                     <th>Vai trò</th>
                     <th>Trạng thái</th>
-                    <th>Hành động</th>
+                    <th class="text-center">Hành động</th>
                 </tr>
             </thead>
             <tbody>
                 <?php foreach ($nvList as $nv): ?>
                     <tr>
-                        <td><?php echo htmlspecialchars($nv['MaND']); ?></td>
+                        <td class="text-center"><?php echo htmlspecialchars($nv['MaND']); ?></td>
                         <td><?php echo htmlspecialchars($nv['HoTen']); ?></td>
                         <td><?php echo htmlspecialchars($nv['SoDienThoai']); ?></td>
                         <td><?php echo htmlspecialchars($nv['TenDangNhap']); ?></td>
@@ -81,8 +81,22 @@
                         <td><?php echo htmlspecialchars($nv['VaiTro']); ?></td>
                         <td><?php echo htmlspecialchars($nv['TrangThai']); ?></td>
                         <td>
-                            <a href="#" class="btn btn-primary">Sửa</a>
-                            <a href="#" class="btn btn-danger">Xóa</a>
+                            <div class="d-flex justify-content-center">
+                                <button class="btn btn-primary btn-edit-nv me-2" data-id="<?= $nv['MaND'] ?>"
+                                    data-hoten="<?= htmlspecialchars($nv['HoTen']) ?>"
+                                    data-sdt="<?= htmlspecialchars($nv['SoDienThoai']) ?>"
+                                    data-tendangnhap="<?= htmlspecialchars($nv['TenDangNhap']) ?>"
+                                    data-email="<?= htmlspecialchars($nv['Email']) ?>"
+                                    data-vaitro="<?= htmlspecialchars($nv['VaiTro']) ?>"
+                                    data-trangthai="<?= htmlspecialchars($nv['TrangThai']) ?>">
+                                    Sửa
+                                </button>
+
+                                <button class="btn btn-danger btn-delete-nv" data-id="<?= $nv['MaND'] ?>"
+                                    data-ten="<?= htmlspecialchars($nv['HoTen']) ?>">
+                                    Xóa
+                                </button>
+                            </div>
                         </td>
                     </tr>
                 <?php endforeach; ?>
@@ -90,6 +104,157 @@
         </table>
     </div>
 </div>
+
+<!-- Modal chỉnh sửa nhân viên -->
+<div class="modal fade" id="editNhanVienModal" tabindex="-1" aria-labelledby="editNhanVienModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editNhanVienModalLabel">Chỉnh Sửa Nhân Viên</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editNhanVienForm">
+                    <input type="hidden" id="editMaND" name="MaND">
+
+                    <div class="mb-3">
+                        <label for="editHoTen" class="form-label">Họ và Tên</label>
+                        <input type="text" class="form-control" id="editHoTen" name="HoTen" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="editSoDienThoai" class="form-label">Số Điện Thoại</label>
+                        <input type="text" class="form-control" id="editSoDienThoai" name="SoDienThoai" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="editTenDangNhap" class="form-label">Tên Đăng Nhập</label>
+                        <input type="text" class="form-control" id="editTenDangNhap" name="TenDangNhap" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="editEmail" class="form-label">Email</label>
+                        <input type="email" class="form-control" id="editEmail" name="Email" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="editVaiTro" class="form-label">Vai Trò</label>
+                        <select class="form-control" id="editVaiTro" name="VaiTro" required>
+                            <option value="admin">Admin</option>
+                            <option value="nhanvien">Nhân viên</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="editTrangThai" class="form-label">Trạng Thái</label>
+                        <select class="form-control" id="editTrangThai" name="TrangThai" required>
+                            <option value="active">Active</option>
+                            <option value="inactive">Inactive</option>
+                        </select>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">Lưu thay đổi</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Mở modal sửa nhân viên -->
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const editButtons = document.querySelectorAll(".btn-edit-nv");
+
+        editButtons.forEach(button => {
+            button.addEventListener("click", function () {
+                document.getElementById("editMaND").value = this.dataset.id;
+                document.getElementById("editHoTen").value = this.dataset.hoten;
+                document.getElementById("editSoDienThoai").value = this.dataset.sdt;
+                document.getElementById("editTenDangNhap").value = this.dataset.tendangnhap;
+                document.getElementById("editEmail").value = this.dataset.email;
+                document.getElementById("editVaiTro").value = this.dataset.vaitro;
+                document.getElementById("editTrangThai").value = this.dataset.trangthai;
+
+                const editModal = new bootstrap.Modal(document.getElementById("editNhanVienModal"));
+                editModal.show();
+            });
+        });
+
+        document.getElementById("editNhanVienForm").addEventListener("submit", function (e) {
+            e.preventDefault();
+            const formData = new FormData(this);
+
+            fetch("edit.php", {
+                method: "POST",
+                body: JSON.stringify(Object.fromEntries(formData)),
+                headers: { "Content-Type": "application/json" }
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        Swal.fire("Đã cập nhật!", "Thông tin nhân viên đã được cập nhật.", "success").then(() => {
+                            location.reload();
+                        });
+                    } else {
+                        Swal.fire("Lỗi!", "Không thể cập nhật thông tin.", "error");
+                    }
+                })
+                .catch(error => console.error("Lỗi:", error));
+        });
+    });
+
+</script>
+
+<!-- Xóa nhân viên -->
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const deleteButtons = document.querySelectorAll(".btn-delete-nv");
+
+        deleteButtons.forEach(button => {
+            button.addEventListener("click", function () {
+                const maND = this.dataset.id;
+                const tenNhanVien = this.dataset.ten;
+
+                Swal.fire({
+                    title: `Bạn có chắc muốn xóa nhân viên "${tenNhanVien}"?`,
+                    text: "Hành động này không thể hoàn tác!",
+                    icon: "warning",
+                    showCancelButton: true,
+                    confirmButtonColor: "#d33",
+                    cancelButtonColor: "#3085d6",
+                    confirmButtonText: "Xóa",
+                    cancelButtonText: "Hủy",
+                    buttonsStyling: false,
+                    customClass: {
+                        actions: 'swal2-actions',
+                        confirmButton: 'swal2-confirm btn btn-danger',
+                        cancelButton: 'swal2-cancel btn btn-primary'
+                    }
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        fetch("delete.php", {
+                            method: "POST",
+                            body: JSON.stringify({ MaND: maND }),
+                            headers: { "Content-Type": "application/json" }
+                        })
+                            .then(response => response.json())
+                            .then(data => {
+                                if (data.success) {
+                                    Swal.fire("Đã xóa!", "Nhân viên đã bị xóa.", "success").then(() => {
+                                        location.reload();
+                                    });
+                                } else {
+                                    Swal.fire("Lỗi!", "Không thể xóa nhân viên.", "error");
+                                }
+                            })
+                            .catch(error => console.error("Lỗi:", error));
+                    }
+                });
+            });
+        });
+    });
+</script>
 
 <script>
     document.addEventListener("DOMContentLoaded", function () {

@@ -49,8 +49,8 @@
 
                 <!-- Dropdown Nhà Cung Cấp -->
                 <div class="dropdown me-2">
-                    <button class="btn btn-secondary dropdown-toggle" style="width:230px;" type="button" id="dropdownNCC"
-                        data-bs-toggle="dropdown">
+                    <button class="btn btn-secondary dropdown-toggle" style="width:230px;" type="button"
+                        id="dropdownNCC" data-bs-toggle="dropdown">
                         Chọn Nhà Cung Cấp
                     </button>
                     <ul class="dropdown-menu" id="nccList" style="width:230px;">
@@ -105,8 +105,24 @@
                         <td class="text-center"><?php echo htmlspecialchars($thuoc['SoLuong']); ?></td>
                         <td class="text-center"><?php echo htmlspecialchars($thuoc['HanSuDung']); ?></td>
                         <td class="text-center">
-                            <a href="#" class="btn btn-primary">Sửa</a>
-                            <a href="#" class="btn btn-danger">Xóa</a>
+                            <div class="d-flex justify-content-center">
+                                <!-- Nút sửa -->
+                                <button class="btn btn-primary btn-edit-thuoc me-2" data-id="<?= $thuoc['MaThuoc'] ?>"
+                                    data-ten="<?= htmlspecialchars($thuoc['TenThuoc']) ?>"
+                                    data-loai="<?= $thuoc['MaLoai'] ?>" data-hang="<?= $thuoc['MaHangSX'] ?>"
+                                    data-ncc="<?= $thuoc['MaNCC'] ?>"
+                                    data-congdung="<?= htmlspecialchars($thuoc['CongDung']) ?>"
+                                    data-gia="<?= $thuoc['Gia'] ?>" data-soluong="<?= $thuoc['SoLuongTon'] ?>"
+                                    data-hsd="<?= $thuoc['HanSuDung'] ?>">
+                                    Sửa
+                                </button>
+
+                                <!-- Nút xóa -->
+                                <button class="btn btn-danger btn-delete-thuoc" data-id="<?= $thuoc['MaThuoc'] ?>"
+                                    data-ten="<?= htmlspecialchars($thuoc['TenThuoc']) ?>">
+                                    Xóa
+                                </button>
+                            </div>
                         </td>
                     </tr>
                 <?php endforeach; ?>
@@ -115,6 +131,193 @@
     </div>
 </div>
 
+<!-- Modal chỉnh sửa thuốc -->
+<div class="modal fade" id="editThuocModal" tabindex="-1" aria-labelledby="editThuocModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editThuocModalLabel">Chỉnh Sửa Thuốc</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editThuocForm">
+                    <input type="hidden" id="editMaThuoc" name="MaThuoc">
+
+                    <div class="mb-3">
+                        <label for="editTenThuoc" class="form-label">Tên Thuốc</label>
+                        <input type="text" class="form-control" id="editTenThuoc" name="TenThuoc" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="editMaLoai" class="form-label">Loại thuốc</label>
+                        <select class="form-control" id="editMaLoai" name="MaLoai" required>
+                            <?php foreach ($loaiList as $loai): ?>
+                                <option value="<?= $loai['MaLoai'] ?>"><?= htmlspecialchars($loai['TenLoai']) ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="editMaHangSX" class="form-label">Hãng sản xuất</label>
+                        <select class="form-control" id="editMaHangSX" name="MaHangSX" required>
+                            <?php foreach ($hsxList as $hang): ?>
+                                <option value="<?= $hang['MaHangSX'] ?>"><?= htmlspecialchars($hang['TenHang']) ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="editMaNCC" class="form-label">Nhà cung cấp</label>
+                        <select class="form-control" id="editMaNCC" name="MaNCC" required>
+                            <?php foreach ($nccList as $ncc): ?>
+                                <option value="<?= $ncc['MaNCC'] ?>"><?= htmlspecialchars($ncc['TenNCC']) ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="editCongDung" class="form-label">Công dụng</label>
+                        <textarea class="form-control" id="editCongDung" name="CongDung" required></textarea>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="editDonGia" class="form-label">Đơn Giá (VNĐ)</label>
+                        <input type="number" class="form-control" id="editDonGia" name="DonGia" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="editSoLuongTon" class="form-label">Số Lượng Tồn</label>
+                        <input type="number" class="form-control" id="editSoLuongTon" name="SoLuongTon" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="editHanSuDung" class="form-label">Hạn Sử Dụng</label>
+                        <input type="date" class="form-control" id="editHanSuDung" name="HanSuDung" required>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">Lưu thay đổi</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Mở modal sửa thuốc -->
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const editButtons = document.querySelectorAll(".btn-edit-thuoc");
+
+        editButtons.forEach(button => {
+            button.addEventListener("click", function () {
+                document.getElementById("editMaThuoc").value = this.dataset.id;
+                document.getElementById("editTenThuoc").value = this.dataset.ten;
+                document.getElementById("editMaLoai").value = this.dataset.loai;
+                document.getElementById("editMaHangSX").value = this.dataset.hang;
+                document.getElementById("editMaNCC").value = this.dataset.ncc;
+                document.getElementById("editCongDung").value = this.dataset.congdung;
+                document.getElementById("editDonGia").value = this.dataset.gia;
+                document.getElementById("editSoLuongTon").value = this.dataset.soluong;
+                document.getElementById("editHanSuDung").value = this.dataset.hsd;
+
+                const editModal = new bootstrap.Modal(document.getElementById("editThuocModal"));
+                editModal.show();
+            });
+        });
+
+        document.getElementById("editThuocForm").addEventListener("submit", function (e) {
+            e.preventDefault();
+            const formData = new FormData(this);
+
+            fetch("edit.php", {
+                method: "POST",
+                body: formData
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert("Thuốc đã được cập nhật thành công!");
+                        location.reload();
+                    } else {
+                        alert("Lỗi khi cập nhật thuốc!");
+                    }
+                })
+                .catch(error => console.error("Lỗi:", error));
+        });
+    });
+</script>
+
+<style>
+    /* Đặt các nút trong cùng một hàng */
+    .swal2-actions {
+        display: flex !important;
+        justify-content: center;
+        gap: 15px;
+        /* Khoảng cách giữa các nút */
+        flex-wrap: nowrap;
+        /* Ngăn nút xuống dòng */
+    }
+
+    /* Thiết kế nút */
+    .swal2-confirm,
+    .swal2-cancel {
+        width: 120px;
+        /* Đảm bảo nút cùng kích thước */
+        height: 40px;
+        font-size: 16px;
+        border-radius: 5px;
+    }
+</style>
+<!-- Xóa thuốc -->
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const deleteButtons = document.querySelectorAll(".btn-delete-thuoc");
+
+        deleteButtons.forEach(button => {
+            button.addEventListener("click", function () {
+                const maThuoc = this.dataset.id;
+                const tenThuoc = this.dataset.ten;
+
+                Swal.fire({
+                    title: `Bạn có chắc muốn xóa thuốc "${tenThuoc}"?`,
+                    text: "Hành động này không thể hoàn tác!",
+                    icon: "warning",
+                    showCancelButton: true,
+                    confirmButtonColor: "#d33",
+                    cancelButtonColor: "#3085d6",
+                    confirmButtonText: "Xóa",
+                    cancelButtonText: "Hủy",
+                    buttonsStyling: false,
+                    customClass: {
+                        actions: 'swal2-actions-row',
+                        confirmButton: 'btn btn-danger swal2-btn-custom',
+                        cancelButton: 'btn btn-primary swal2-btn-custom'
+                    }
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        fetch("delete.php", {
+                            method: "POST",
+                            body: JSON.stringify({ MaThuoc: maThuoc }),
+                            headers: { "Content-Type": "application/json" }
+                        })
+                            .then(response => response.json())
+                            .then(data => {
+                                if (data.success) {
+                                    Swal.fire("Đã xóa!", "Thuốc đã bị xóa.", "success").then(() => {
+                                        location.reload();
+                                    });
+                                } else {
+                                    Swal.fire("Lỗi!", "Không thể xóa thuốc.", "error");
+                                }
+                            })
+                            .catch(error => console.error("Lỗi:", error));
+                    }
+                });
+            });
+        });
+    });
+</script>
+
+<!-- Lọc thuốc -->
 <script>
     document.addEventListener("DOMContentLoaded", function () {
         const searchBtn = document.getElementById("searchBtn");

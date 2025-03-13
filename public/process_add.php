@@ -31,7 +31,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $stmt->bindParam(':hanSuDung', $hanSuDung, PDO::PARAM_STR);
 
             if ($stmt->execute()) {
-                echo "<script>alert('Thêm thuốc thành công!'); window.location.href='add.php?id=formThuoc';</script>";
+                echo "<script>alert('Thêm thuốc thành công!'); window.location.href='index.php';</script>";
             } else {
                 echo "<script>alert('Thêm thuốc thất bại!'); window.history.back();</script>";
             }
@@ -65,7 +65,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $result = themNhanVien($pdo, $hoTen, $tenDangNhap, $email, $matKhau, $soDienThoai, $vaiTro, $trangThai);
 
         if ($result === true) {
-            echo "<script>alert('Thêm nhân viên thành công!'); window.location.href='add.php?id=formNhanVien';</script>";
+            echo "<script>alert('Thêm nhân viên thành công!'); window.location.href='index.php';</script>";
         } else {
             echo "<script>alert('$result'); window.history.back();</script>";
         }

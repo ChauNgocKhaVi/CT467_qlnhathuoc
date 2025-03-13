@@ -196,8 +196,6 @@ function layChiTietHoaDon($pdo, $maHD)
     return $stmt->fetchAll();
 }
 
-
-
 // --------------------- LẤY LOẠI THUỐC ---------------------
 
 // Lấy danh sách tất cả thể loại thuốc
@@ -306,4 +304,80 @@ function themNhanVien(PDO $pdo, $hoTen, $tenDangNhap, $email, $matKhau, $soDienT
         return "Thêm nhân viên thất bại!";
     }
 }
+
+// --------------------- EDIT ---------------------
+
+// Cập nhật thông tin thuốc
+function suaThuoc($pdo, $data)
+{
+    try {
+        $stmt = $pdo->prepare("
+            UPDATE Thuoc 
+            SET MaLoai = ?, MaHangSX = ?, MaNCC = ?, TenThuoc = ?, CongDung = ?, DonGia = ?, SoLuongTon = ?, HanSuDung = ? 
+            WHERE MaThuoc = ?
+        ");
+        return $stmt->execute([
+            $data['MaLoai'],
+            $data['MaHangSX'],
+            $data['MaNCC'],
+            $data['TenThuoc'],
+            $data['CongDung'],
+            $data['DonGia'],
+            $data['SoLuongTon'],
+            $data['HanSuDung'],
+            $data['MaThuoc']
+        ]);
+    } catch (Exception $e) {
+        return false;
+    }
+}
+
+
+// Cập nhật nhân viên
+function suaNhanVien($pdo, $data)
+{
+    try {
+        $stmt = $pdo->prepare("
+            UPDATE Admin SET HoTen = ?, SoDienThoai = ?, TenDangNhap = ?, Email = ?, VaiTro = ?, TrangThai = ? 
+            WHERE MaND = ?
+        ");
+        return $stmt->execute([
+            $data['HoTen'],
+            $data['SoDienThoai'],
+            $data['TenDangNhap'],
+            $data['Email'],
+            $data['VaiTro'],
+            $data['TrangThai'],
+            $data['MaND']
+        ]);
+    } catch (Exception $e) {
+        return false;
+    }
+}
+
+// --------------------- XÓA ---------------------
+
+// Xóa thuốc
+function xoaThuoc($pdo, $MaThuoc)
+{
+    try {
+        $stmt = $pdo->prepare("DELETE FROM Thuoc WHERE MaThuoc = ?");
+        return $stmt->execute([$MaThuoc]);
+    } catch (Exception $e) {
+        return false;
+    }
+}
+
+// Xóa nhân viên
+function xoaNhanVien($pdo, $MaND)
+{
+    try {
+        $stmt = $pdo->prepare("DELETE FROM Admin WHERE MaND = ?");
+        return $stmt->execute([$MaND]);
+    } catch (Exception $e) {
+        return false;
+    }
+}
+
+
 ?>
