@@ -4,7 +4,7 @@
         <h2 class="section-title bg-light p-2 rounded potta-one-regular ">Hóa Đơn</h2>
         <!-- Hiển thị thông báo -->
         <?php if (!empty($successHD)): ?>
-            <div class="alert alert-success alert-message"><?php echo htmlspecialchars($successHD); ?></div>
+            <div class="alert alert-success alert-message"><?php echo htmlspecialchars(string: $successHD); ?></div>
         <?php endif; ?>
         <div class="d-flex justify-content-between align-items-center mb-3">
             <!-- Tìm kiếm -->
