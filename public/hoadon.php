@@ -42,9 +42,11 @@
                         <td><?php echo htmlspecialchars($hoadon['NgayLap']); ?></td>
                         <td><?php echo htmlspecialchars($hoadon['TongTien']); ?></td>
                         <td>
-                            <a href="index.php?MaHD=<?php echo htmlspecialchars($hoadon['MaHD']); ?>" class="btn btn-info">
+                            <!-- Nút mở modal -->
+                            <button class="btn btn-info btn-chi-tiet" data-bs-toggle="modal" data-bs-target="#modalChiTiet"
+                                data-mahd="<?php echo $hoadon['MaHD']; ?>">
                                 Xem chi tiết
-                            </a>
+                            </button>
                         </td>
                         <td>
                             <a href="edit_hoadon.php?MaHD=<?php echo $hoadon['MaHD']; ?>" class="btn btn-primary">Sửa</a>
@@ -56,30 +58,67 @@
                 <?php endforeach; ?>
             </tbody>
         </table>
-        <?php if (!empty($chiTietHD)): ?>
-            <h3 class="mt-4">Chi Tiết Hóa Đơn #<?php echo htmlspecialchars($maHD); ?></h3>
-            <table class="table table-bordered">
-                <thead>
-                    <tr>
-                        <th>Mã Thuốc</th>
-                        <th>Tên Thuốc</th>
-                        <th>Số Lượng</th>
-                        <th>Giá Bán</th>
-                        <th>Thành Tiền</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php foreach ($chiTietHD as $ct): ?>
-                        <tr>
-                            <td><?php echo htmlspecialchars($ct['MaThuoc']); ?></td>
-                            <td><?php echo htmlspecialchars($ct['TenThuoc']); ?></td>
-                            <td><?php echo htmlspecialchars($ct['SoLuongBan']); ?></td>
-                            <td><?php echo number_format($ct['GiaBan'], 2); ?> VNĐ</td>
-                            <td><?php echo number_format($ct['ThanhTien'], 2); ?> VNĐ</td>
-                        </tr>
-                    <?php endforeach; ?>
-                </tbody>
-            </table>
-        <?php endif; ?>
     </div>
 </div>
+
+<!-- Modal Chi Tiết Hóa Đơn -->
+<div class="modal fade" id="modalChiTiet" tabindex="-1" aria-labelledby="modalChiTietLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalChiTietLabel">Chi Tiết Hóa Đơn</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Mã Thuốc</th>
+                            <th>Tên Thuốc</th>
+                            <th>Số Lượng</th>
+                            <th>Giá Bán</th>
+                            <th>Thành Tiền</th>
+                        </tr>
+                    </thead>
+                    <tbody id="chiTietContent">
+                        <!-- Nội dung chi tiết hóa đơn sẽ được thêm vào bằng JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- JavaScript để tải chi tiết hóa đơn khi mở modal -->
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const modalChiTiet = document.getElementById("modalChiTiet");
+        const chiTietContent = document.getElementById("chiTietContent");
+
+        document.querySelectorAll(".btn-chi-tiet").forEach(button => {
+            button.addEventListener("click", function () {
+                const maHD = this.getAttribute("data-mahd");
+
+                // Gửi AJAX để lấy chi tiết hóa đơn
+                fetch("get_chitiet_hoadon.php?MaHD=" + maHD)
+                    .then(response => response.json())
+                    .then(data => {
+                        let content = "";
+                        data.forEach(item => {
+                            content += `
+                            <tr>
+                                <td>${item.MaThuoc}</td>
+                                <td>${item.TenThuoc}</td>
+                                <td>${item.SoLuongBan}</td>
+                                <td>${new Intl.NumberFormat().format(item.GiaBan)} VNĐ</td>
+                                <td>${new Intl.NumberFormat().format(item.ThanhTien)} VNĐ</td>
+                            </tr>
+                        `;
+                        });
+                        chiTietContent.innerHTML = content;
+                    })
+                    .catch(error => console.error("Lỗi khi tải chi tiết hóa đơn:", error));
+            });
+        });
+    });
+</script>
