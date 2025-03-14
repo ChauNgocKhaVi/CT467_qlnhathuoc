@@ -193,10 +193,8 @@ include __DIR__ . '/../src/partials/header.php';
                         <a class="nav-link" href="#thuoc" id="showThuoc"><strong>Quản lý thuốc</strong></a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="index.php?tab=loai" id="showLoai"><strong>Quản lý loại
-                                thuốc</strong></a>
+                        <a class="nav-link" href="index.php?tab=loai" id="showLoai"><strong>Quản lý loại thuốc</strong></a>
                     </li>
-
                     <li class="nav-item">
                         <a class="nav-link" href="#ncc" id="showNCC"><strong>Quản lý nhà cung cấp</strong></a>
                     </li>
@@ -217,8 +215,7 @@ include __DIR__ . '/../src/partials/header.php';
                                 hạn</strong></a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#nhapThuoc" id="showNhapThuoc"><strong>Nhập thuốc từ
-                                Excel</strong></a>
+                        <a class="nav-link" href="#nhapThuoc" id="showNhapThuoc"><strong>Nhập thuốc từ Excel</strong></a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="#xuatFile" id="showXuatFile"><strong>Xuất file </strong></a>
@@ -253,6 +250,7 @@ include __DIR__ . '/../src/partials/header.php';
             <!-- Nhập thuốc từ Excel -->
 
             <!-- Xuất file Excel -->
+            <?php include __DIR__ . '/xuatexcel.php'; ?>
         </div>
     </div>
 </div>

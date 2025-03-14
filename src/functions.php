@@ -410,5 +410,93 @@ function capNhatThongBaoThuocHetHan($pdo)
     $stmt->execute();
 }
 
+// --------------------- XUẤT EXCEL -------------------------
+
+// Lấy tên khách hàng
+function getTenKhachHang(PDO $pdo, int $maKH): string
+{
+    if ($maKH === 0)
+        return "Khách lẻ"; // Nếu MaKH là 0, nghĩa là không có khách hàng
+
+    $stmt = $pdo->prepare("SELECT TenKH FROM KhachHang WHERE MaKH = :maKH");
+    $stmt->execute(['maKH' => $maKH]);
+    $result = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    return $result['TenKH'] ?? "Không xác định";
+}
+
+// Lấy tên thuốc
+function getTenThuoc(PDO $pdo, int $maThuoc): string
+{
+    $stmt = $pdo->prepare("SELECT TenThuoc FROM Thuoc WHERE MaThuoc = :maThuoc");
+    $stmt->execute(['maThuoc' => $maThuoc]);
+    $result = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    return $result['TenThuoc'] ?? 'Không xác định';
+}
+
+
+// Lấy danh sách chi tiết hóa đơn
+function getDanhSachChiTietHoaDon(PDO $pdo): array
+{
+    $stmt = $pdo->query("
+        SELECT cthd.MaHD, t.TenThuoc, cthd.SoLuongBan, cthd.GiaBan, 
+               (cthd.SoLuongBan * cthd.GiaBan) AS ThanhTien
+        FROM ChiTietHoaDon cthd
+        JOIN Thuoc t ON cthd.MaThuoc = t.MaThuoc
+    ");
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
+
+// Lấy danh sách hóa đơn
+function getDanhSachHoaDon(PDO $pdo): array
+{
+    $query = "SELECT hd.MaHD, hd.NgayLap, hd.TongTien, COALESCE(hd.MaKH, 0) AS MaKH 
+    FROM HoaDon hd";
+    $stmt = $pdo->query($query);
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
+
+// Lấy danh sách thuốc
+function getDanhSachThuoc(PDO $pdo): array
+{
+    $stmt = $pdo->query("
+        SELECT t.MaThuoc, t.TenThuoc, l.TenLoai AS Loai, hsx.TenHang AS HangSanXuat, 
+            ncc.TenNCC AS NhaCungCap, t.CongDung, t.DonGia, t.SoLuongTon, t.HanSuDung
+        FROM Thuoc t
+        JOIN LoaiThuoc l ON t.MaLoai = l.MaLoai
+        JOIN HangSX hsx ON t.MaHangSX = hsx.MaHangSX
+        JOIN NhaCungCap ncc ON t.MaNCC = ncc.MaNCC
+    ");
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
+
+// Lấy danh sách loại thuốc
+function getDanhSachLoaiThuoc(PDO $pdo): array
+{
+    $stmt = $pdo->query("SELECT MaLoai, TenLoai FROM LoaiThuoc");
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
+
+// Lấy danh sách nhà cung cấp
+function getDanhSachNhaCungCap(PDO $pdo): array
+{
+    $stmt = $pdo->query("SELECT MaNCC, TenNCC, SoDienThoai FROM NhaCungCap");
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
+
+// Lấy danh sách hãng sản xuất
+function getDanhSachHangSanXuat(PDO $pdo): array
+{
+    $stmt = $pdo->query("SELECT MaHangSX, TenHang, QuocGia FROM HangSX");
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
+
+// Lấy danh sách khách hàng
+function getDanhSachKhachHang(PDO $pdo): array
+{
+    $stmt = $pdo->query("SELECT MaKH, TenKH, SoDienThoai FROM KhachHang");
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
 
 ?>
