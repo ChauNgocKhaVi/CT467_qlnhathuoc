@@ -118,5 +118,20 @@ END$$
 
 DELIMITER ;
 
+-- Thống kê Doanh Thu
+DELIMITER $$
+
+CREATE PROCEDURE ThongKeDoanhThu()
+BEGIN
+    SELECT DATE(NgayLap) AS Ngay, SUM(TongTien) AS DoanhThu
+    FROM HoaDon
+    GROUP BY DATE(NgayLap)
+    ORDER BY Ngay DESC;
+END $$
+
+DELIMITER ;
+
+
+
 
 
