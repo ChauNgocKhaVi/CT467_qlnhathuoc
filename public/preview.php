@@ -24,7 +24,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && !empty($_POST['tables'])) {
                 break;
             case 'hangsanxuat':
                 $data = getDanhSachHangSanXuat($pdo);
-                $headers = ["Mã Hãng", "Tên Hãng"];
+                $headers = ["Mã Hãng", "Tên Hãng", "Quốc Gia"];
                 break;
             case 'khachhang':
                 $data = getDanhSachKhachHang($pdo);

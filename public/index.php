@@ -8,7 +8,13 @@ if (!isset($_SESSION["username"])) {
     exit();
 } elseif (!empty($_SESSION['success_message'])) {
     $successMessage = $_SESSION['success_message'];
-    unset($_SESSION['success_message']); // Xóa session sau khi hiển th
+    unset($_SESSION['success_message']); // Xóa session sau khi hiển thị
+}
+
+// Kiểm tra xem có thông báo thành công không
+if (isset($_SESSION['success_message_import'])) {
+    $successMessageImport = $_SESSION['success_message_import'];
+    unset($_SESSION['success_message_import']); // Xóa session sau khi hiển thị thông báo
 }
 
 $vaitro = ($_SESSION['VaiTro']);
@@ -44,6 +50,17 @@ $successHD = $_GET['successHD'] ?? ''; // Lấy thông báo thành công
 include __DIR__ . '/../src/partials/head.php';
 include __DIR__ . '/../src/partials/header.php';
 ?>
+
+<!-- Nếu có thông báo, hiển thị alert -->
+<?php if (isset($successMessageImport)): ?>
+    <script>
+        alert("<?php echo $successMessageImport; ?>");
+        // Sau 2 giây sẽ tự động chuyển hướng về index.php
+        setTimeout(function () {
+            window.location.href = "index.php";
+        }, 2000);
+    </script>
+<?php endif; ?>
 
 <style>
     .sidebar {
@@ -193,7 +210,8 @@ include __DIR__ . '/../src/partials/header.php';
                         <a class="nav-link" href="#thuoc" id="showThuoc"><strong>Quản lý thuốc</strong></a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="index.php?tab=loai" id="showLoai"><strong>Quản lý loại thuốc</strong></a>
+                        <a class="nav-link" href="index.php?tab=loai" id="showLoai"><strong>Quản lý loại
+                                thuốc</strong></a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="#ncc" id="showNCC"><strong>Quản lý nhà cung cấp</strong></a>
@@ -215,7 +233,8 @@ include __DIR__ . '/../src/partials/header.php';
                                 hạn</strong></a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#nhapThuoc" id="showNhapThuoc"><strong>Nhập thuốc từ Excel</strong></a>
+                        <a class="nav-link" href="#nhapExcel" id="showNhapExcel"><strong>Nhập thuốc từ
+                                Excel</strong></a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="#xuatFile" id="showXuatFile"><strong>Xuất file </strong></a>
@@ -248,6 +267,7 @@ include __DIR__ . '/../src/partials/header.php';
             <?php include __DIR__ . '/thongbao.php'; ?>
 
             <!-- Nhập thuốc từ Excel -->
+            <?php include __DIR__ . '/nhapExcel.php'; ?>
 
             <!-- Xuất file Excel -->
             <?php include __DIR__ . '/xuatexcel.php'; ?>
@@ -281,7 +301,7 @@ include __DIR__ . '/../src/partials/header.php';
             { linkId: 'showThongBao', sectionId: 'thongBao' },
             { linkId: 'showNCC', sectionId: 'ncc' },
             { linkId: 'showHSX', sectionId: 'hsx' },
-            { linkId: 'showNhapThuoc', sectionId: 'nhapThuoc' },
+            { linkId: 'showNhapExcel', sectionId: 'nhapExcel' },
             { linkId: 'showKhachHang', sectionId: 'khachHang' },
             { linkId: 'showXuatFile', sectionId: 'xuatFile' },
             { linkId: 'showNhanVien', sectionId: 'nhanVien' }
