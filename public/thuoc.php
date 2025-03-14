@@ -230,24 +230,42 @@
 
         document.getElementById("editThuocForm").addEventListener("submit", function (e) {
             e.preventDefault();
-            const formData = new FormData(this);
 
+            const formData = new FormData(this);
+            let data = {};
+
+            formData.forEach((value, key) => {
+                data[key] = value;  // Đảm bảo rằng mỗi giá trị từ form được gán vào đối tượng data
+                console.log(key + ": " + value); // In ra console để kiểm tra dữ liệu
+            });
+
+            // Gửi dữ liệu tới server
             fetch("edit.php", {
                 method: "POST",
-                body: formData
+                headers: {
+                    "Content-Type": "application/json",  // Đảm bảo gửi dữ liệu dưới dạng JSON
+                },
+                body: JSON.stringify(data)  // Chuyển đổi data thành JSON
             })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        alert("Thuốc đã được cập nhật thành công!");
-                        location.reload();
-                    } else {
-                        alert("Lỗi khi cập nhật thuốc!");
+                .then(response => response.text())  // Đọc phản hồi như text để kiểm tra
+                .then(text => {
+                    console.log("Phản hồi từ server:", text); // In phản hồi ra console để kiểm tra
+                    try {
+                        const data = JSON.parse(text);  // Chuyển đổi phản hồi thành JSON
+                        if (data.success) {
+                            alert("Thuốc đã được cập nhật thành công!");
+                            location.reload();  // Tải lại trang để xem dữ liệu cập nhật
+                        } else {
+                            alert("Lỗi khi cập nhật thuốc: " + data.message);  // Hiển thị thông báo lỗi chi tiết
+                        }
+                    } catch (error) {
+                        alert("Lỗi xử lý JSON: " + error.message);
                     }
                 })
                 .catch(error => console.error("Lỗi:", error));
         });
     });
+
 </script>
 
 <style>

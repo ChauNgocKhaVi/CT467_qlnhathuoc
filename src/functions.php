@@ -206,6 +206,27 @@ function layTatCaLoaiThuoc(PDO $pdo): array
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
 
+// Hàm gọi Stored Function để lấy tổng số lượng thuốc trong kho của một loại thuốc
+function tongSoLuongThuocTheoLoai(PDO $pdo, $maLoai)
+{
+    try {
+        // Câu lệnh SQL gọi Stored Function
+        $stmt = $pdo->prepare("SELECT tong_so_luong_thuoc_theo_loai(:maLoai) AS tongSoLuong");
+        $stmt->bindParam(':maLoai', $maLoai, PDO::PARAM_INT);
+
+        // Thực thi câu lệnh SQL
+        $stmt->execute();
+
+        // Lấy kết quả và trả về
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        return $result['tongSoLuong'] ?? 0;  // Trả về tổng số lượng hoặc 0 nếu không có kết quả
+    } catch (PDOException $e) {
+        // Nếu có lỗi, ghi lại lỗi và trả về 0
+        error_log("Lỗi khi gọi Stored Function: " . $e->getMessage());
+        return 0;
+    }
+}
 
 // --------------------- LẤY NHÀ CUNG CẤP ---------------------
 
@@ -250,22 +271,35 @@ function layTatCaNhanVien(PDO $pdo): array
 // --------------------- THÊM ---------------------
 
 //Thêm thuốc
-function themThuoc(PDO $pdo, $maLoai, $maHangSX, $maNCC, $tenThuoc, $donGia, $soLuongTon, $hanSuDung)
+function themThuoc(PDO $pdo, $maLoai, $maHangSX, $maNCC, $tenThuoc, $congDung, $donGia, $soLuongTon, $hanSuDung)
 {
-    $query = "INSERT INTO Thuoc (MaLoai, MaHangSX, MaNCC, TenThuoc, DonGia, SoLuongTon, HanSuDung) 
-            VALUES (:maLoai, :maHangSX, :maNCC, :tenThuoc, :donGia, :soLuongTon, :hanSuDung)";
-    $stmt = $pdo->prepare($query);
+    try {
+        // Câu lệnh gọi Stored Procedure
+        $stmt = $pdo->prepare("
+            CALL ThemThuoc(:maLoai, :maHangSX, :maNCC, :tenThuoc, :congDung, :donGia, :soLuongTon, :hanSuDung)
+        ");
 
-    $stmt->bindParam(':maLoai', $maLoai, PDO::PARAM_INT);
-    $stmt->bindParam(':maHangSX', $maHangSX, PDO::PARAM_INT);
-    $stmt->bindParam(':maNCC', $maNCC, PDO::PARAM_INT);
-    $stmt->bindParam(':tenThuoc', $tenThuoc, PDO::PARAM_STR);
-    $stmt->bindParam(':donGia', $donGia, PDO::PARAM_STR);
-    $stmt->bindParam(':soLuongTon', $soLuongTon, PDO::PARAM_INT);
-    $stmt->bindParam(':hanSuDung', $hanSuDung, PDO::PARAM_STR);
+        // Bind các tham số vào câu lệnh
+        $stmt->bindParam(':maLoai', $maLoai, PDO::PARAM_INT);
+        $stmt->bindParam(':maHangSX', $maHangSX, PDO::PARAM_INT);
+        $stmt->bindParam(':maNCC', $maNCC, PDO::PARAM_INT);
+        $stmt->bindParam(':tenThuoc', $tenThuoc, PDO::PARAM_STR);
+        $stmt->bindParam(':congDung', $congDung, PDO::PARAM_STR);
+        $stmt->bindParam(':donGia', $donGia, PDO::PARAM_STR);
+        $stmt->bindParam(':soLuongTon', $soLuongTon, PDO::PARAM_INT);
+        $stmt->bindParam(':hanSuDung', $hanSuDung, PDO::PARAM_STR);
 
-    return $stmt->execute();
+        // Thực thi câu lệnh
+        $stmt->execute();
+
+        return true;
+    } catch (Exception $e) {
+        // Ghi log lỗi nếu có
+        error_log("Lỗi khi thực thi stored procedure ThemThuoc: " . $e->getMessage());
+        return false;
+    }
 }
+
 
 // Thêm nhân viên
 function themNhanVien(PDO $pdo, $hoTen, $tenDangNhap, $email, $matKhau, $soDienThoai, $vaiTro, $trangThai)
@@ -307,31 +341,42 @@ function themNhanVien(PDO $pdo, $hoTen, $tenDangNhap, $email, $matKhau, $soDienT
 
 // --------------------- EDIT ---------------------
 
-// Cập nhật thông tin thuốc
+// Cập nhật thông tin thuốc bằng Stored Procedure
 function suaThuoc($pdo, $data)
 {
     try {
+        // Sử dụng CALL và đảm bảo tên tham số đúng theo Stored Procedure
         $stmt = $pdo->prepare("
-            UPDATE Thuoc 
-            SET MaLoai = ?, MaHangSX = ?, MaNCC = ?, TenThuoc = ?, CongDung = ?, DonGia = ?, SoLuongTon = ?, HanSuDung = ? 
-            WHERE MaThuoc = ?
+            CALL SuaThuoc(:id, :maLoai, :maHangSX, :maNCC, :tenThuoc, :congDung, :donGia, :soLuongTon, :hanSuDung)
         ");
-        return $stmt->execute([
-            $data['MaLoai'],
-            $data['MaHangSX'],
-            $data['MaNCC'],
-            $data['TenThuoc'],
-            $data['CongDung'],
-            $data['DonGia'],
-            $data['SoLuongTon'],
-            $data['HanSuDung'],
-            $data['MaThuoc']
+
+        // Gọi các tham số đã được đặt trong câu lệnh CALL
+        $result = $stmt->execute([
+            ':id' => $data['MaThuoc'],               // MaThuoc cần được truyền vào
+            ':maLoai' => $data['MaLoai'],             // MaLoai
+            ':maHangSX' => $data['MaHangSX'],         // MaHangSX
+            ':maNCC' => $data['MaNCC'],               // MaNCC
+            ':tenThuoc' => $data['TenThuoc'],         // TenThuoc
+            ':congDung' => $data['CongDung'],         // CongDung
+            ':donGia' => $data['DonGia'],             // DonGia
+            ':soLuongTon' => $data['SoLuongTon'],     // SoLuongTon
+            ':hanSuDung' => $data['HanSuDung']        // HanSuDung
         ]);
+
+        // Kiểm tra kết quả thực thi
+        if ($result) {
+            return true;
+        } else {
+            // Log nếu không thực thi thành công
+            error_log("Lỗi khi thực thi câu lệnh UPDATE thuốc");
+            return false;
+        }
     } catch (Exception $e) {
+        // Log lỗi nếu có
+        error_log("Lỗi: " . $e->getMessage());
         return false;
     }
 }
-
 
 // Cập nhật nhân viên
 function suaNhanVien($pdo, $data)

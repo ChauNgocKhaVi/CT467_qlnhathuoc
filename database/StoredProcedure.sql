@@ -1,13 +1,3 @@
--- Lấy danh sách thuốc theo loại
-DELIMITER $$
-CREATE PROCEDURE LayThuocTheoLoai(IN loai INT)
-BEGIN
-    SELECT * FROM Thuoc WHERE MaLoai = loai ORDER BY TenThuoc ASC;
-END $$
-DELIMITER ;
-
-CALL LayThuocTheoLoai(2);
-
 -- Thêm thuốc mới
 DELIMITER $$
 CREATE PROCEDURE ThemThuoc(
@@ -35,7 +25,7 @@ CREATE PROCEDURE SuaThuoc(
     IN maLoai INT, 
     IN maHangSX INT, 
     IN maNCC INT, 
-    IN tenThuoc VARCHAR(255), 
+    IN tenThuoc VARCHAR(100), 
     IN congDung TEXT, 
     IN donGia DECIMAL(10,2), 
     IN soLuongTon INT, 
@@ -52,17 +42,7 @@ DELIMITER ;
 
 CALL SuaThuoc(1, 2, 3, 4, 'Ibuprofen', 'Giảm đau, chống viêm', 7000, 50, '2026-06-30');
 
--- Xóa thuốc khỏi hệ thống
-DELIMITER $$
-CREATE PROCEDURE XoaThuoc(IN id INT)
-BEGIN
-    DELETE FROM Thuoc WHERE MaThuoc = id;
-END $$
-DELIMITER ;
-
-CALL XoaThuoc(1);
-
--- đăng ký
+-- Đăng ký
 DELIMITER $$
 
 CREATE PROCEDURE DangKy(
