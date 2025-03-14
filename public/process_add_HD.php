@@ -2,44 +2,67 @@
 require_once __DIR__ . '/../src/bootstrap.php';
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    $maKH = $_POST['MaKH'];
+    $ngayLap = $_POST['NgayLap'];
+    $tongTien = 0;
+
+    $thuocList = $_POST['MaThuoc'] ?? [];
+    $soLuongList = $_POST['SoLuongBan'] ?? [];
+    $giaBanList = $_POST['GiaBan'] ?? [];
+
+    $pdo->beginTransaction(); // Bắt đầu transaction
+
     try {
-        $pdo->beginTransaction(); // Bắt đầu transaction
+        // Nếu khách hàng mới, thêm vào bảng KhachHang
+        if ($maKH == "new") {
+            $tenKH = trim($_POST['TenKH']);
+            $soDienThoai = trim($_POST['SoDienThoai']);
+            $diaChi = trim($_POST['DiaChi']);
 
-        $maKH = $_POST['MaKH'] ?? '';
-        $tenKH = $_POST['TenKH'] ?? '';
-        $soDienThoai = $_POST['SoDienThoai'] ?? '';
-        $diaChi = $_POST['DiaChi'] ?? '';
-        $ngayLap = $_POST['NgayLap'] ?? date('Y-m-d');
-        $tongTien = $_POST['TongTien'] ?? 0;
+            if (empty($tenKH) || empty($soDienThoai) || empty($diaChi)) {
+                throw new Exception("Thông tin khách hàng không đầy đủ.");
+            }
 
-        // Nếu khách hàng chọn "Thêm mới", cần thêm vào CSDL
-        if ($maKH === "new" && !empty($tenKH) && !empty($soDienThoai) && !empty($diaChi)) {
-            $stmt = $pdo->prepare("INSERT INTO KhachHang (TenKH, SoDienThoai, DiaChi) VALUES (:tenKH, :soDienThoai, :diaChi)");
-            $stmt->execute([
-                'tenKH' => $tenKH,
-                'soDienThoai' => $soDienThoai,
-                'diaChi' => $diaChi
-            ]);
-            $maKH = $pdo->lastInsertId(); // Lấy ID khách hàng vừa thêm
+            $stmt = $pdo->prepare("INSERT INTO KhachHang (TenKH, SoDienThoai, DiaChi) VALUES (?, ?, ?)");
+            $stmt->execute([$tenKH, $soDienThoai, $diaChi]);
+            $maKH = $pdo->lastInsertId();
+        } else {
+            $maKH = intval($maKH);
         }
 
-        // Thêm hóa đơn vào CSDL
-        $stmt = $pdo->prepare("INSERT INTO HoaDon (MaKH, NgayLap, TongTien) VALUES (:maKH, :ngayLap, :tongTien)");
-        $stmt->execute([
-            'maKH' => !empty($maKH) ? $maKH : null,
-            'ngayLap' => $ngayLap,
-            'tongTien' => $tongTien
-        ]);
+        // Thêm hóa đơn vào bảng HoaDon
+        $stmt = $pdo->prepare("INSERT INTO HoaDon (MaKH, NgayLap, TongTien) VALUES (?, ?, ?)");
+        $stmt->execute([$maKH, $ngayLap, $tongTien]);
+        $maHD = $pdo->lastInsertId();
+
+        // Thêm chi tiết hóa đơn và tính tổng tiền
+        $stmt = $pdo->prepare("INSERT INTO ChiTietHoaDon (MaHD, MaThuoc, SoLuongBan, GiaBan) VALUES (?, ?, ?, ?)");
+        
+        foreach ($thuocList as $index => $maThuoc) {
+            $maThuoc = intval($maThuoc);
+            $soLuong = isset($soLuongList[$index]) ? intval($soLuongList[$index]) : 0;
+            $giaBan = isset($giaBanList[$index]) ? floatval($giaBanList[$index]) : 0;
+
+            if ($maThuoc > 0 && $soLuong > 0 && $giaBan >= 0) {
+                $tongTien += $soLuong * $giaBan;
+                $stmt->execute([$maHD, $maThuoc, $soLuong, $giaBan]);
+            }
+        }
+
+        // Cập nhật tổng tiền cho hóa đơn
+        $stmt = $pdo->prepare("UPDATE HoaDon SET TongTien = ? WHERE MaHD = ?");
+        $stmt->execute([$tongTien, $maHD]);
 
         $pdo->commit(); // Xác nhận transaction
 
-        // Chuyển hướng với thông báo thành công
-        header("Location: index.php?successHD=Hóa đơn đã được tạo thành công");
+        header("Location: index.php?success=1");
         exit();
     } catch (Exception $e) {
-        $pdo->rollBack(); // Hoàn tác nếu có lỗi
-        header("Location: add_hoadon.php?errorHD=Lỗi khi tạo hóa đơn: " . $e->getMessage());
-        exit();
+        $pdo->rollBack(); // Hủy bỏ transaction nếu có lỗi
+        die("Lỗi: " . $e->getMessage());
     }
+} else {
+    header("Location: index.php");
+    exit();
 }
 ?>

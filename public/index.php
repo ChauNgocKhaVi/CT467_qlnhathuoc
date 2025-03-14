@@ -39,13 +39,27 @@ $thongBaoList = layThongBaoThuocHetHan($pdo); // Gọi hàm lấy danh sách th�
 $thuocSapHetHan = layThongBaoThuocHetHan($pdo);
 $thuocSapHetHanIds = array_column($thuocSapHetHan, 'MaThuoc'); // Lấy danh sách mã thuốc hết hạn
 
+// Kiểm tra nếu có từ khóa tìm kiếm
+$searchTenKH = isset($_GET['TenKH']) ? trim($_GET['TenKH']) : '';
+$hoadonList = layHoaDonBanThuoc($pdo);
+
+
 
 $chiTietHD = [];
 $maHD = '';
 
 if (isset($_GET['MaHD']) && !empty($_GET['MaHD'])) {
-    $maHD = $_GET['MaHD'];
-    $chiTietHD = layChiTietHoaDon($pdo, $maHD);
+$maHD = $_GET['MaHD'];
+$chiTietHD = layChiTietHoaDon($pdo, $maHD);
+}
+// Gọi stored procedure ThongKeDoanhThu
+$thongKeList = [];
+try {
+$stmt = $pdo->prepare("CALL ThongKeDoanhThu()");
+$stmt->execute();
+$thongKeList = $stmt->fetchAll(PDO::FETCH_ASSOC);
+} catch (Exception $e) {
+echo "Lỗi truy vấn thống kê: " . $e->getMessage();
 }
 
 $successLoai = $_GET['successLoai'] ?? ''; // Lấy thông báo thành công
@@ -58,150 +72,139 @@ include __DIR__ . '/../src/partials/head.php';
 include __DIR__ . '/../src/partials/header.php';
 ?>
 
-<!-- Nếu có thông báo, hiển thị alert -->
-<?php if (isset($successMessageImport)): ?>
-    <script>
-        alert("<?php echo $successMessageImport; ?>");
-        // Sau 2 giây sẽ tự động chuyển hướng về index.php
-        setTimeout(function () {
-            window.location.href = "index.php";
-        }, 2000);
-    </script>
-<?php endif; ?>
-
 <style>
-    .sidebar {
-        background: linear-gradient(135deg, #74ebd5, #acb6e5);
-        padding: 10px;
-        border-radius: 5px;
-        box-shadow: 0 5px 8px rgba(0, 0, 0, 0.1);
-    }
+.sidebar {
+    background: linear-gradient(135deg, #74ebd5, #acb6e5);
+    padding: 10px;
+    border-radius: 5px;
+    box-shadow: 0 5px 8px rgba(0, 0, 0, 0.1);
+}
 
-    .nav-link {
-        color: #000;
-        padding: 12px 15px;
-        margin-bottom: 5px;
-        border-radius: 5px;
-        display: block;
-        transition: background-color 0.3s, color 0.3s;
-    }
+.nav-link {
+    color: #000;
+    padding: 12px 15px;
+    margin-bottom: 5px;
+    border-radius: 5px;
+    display: block;
+    transition: background-color 0.3s, color 0.3s;
+}
 
-    .nav-item {
-        list-style: none;
-    }
+.nav-item {
+    list-style: none;
+}
 
-    .nav-link:hover {
-        background-color: #e9ecef;
-        /* Màu xám nhạt */
-        color: #000;
-        /* Giữ nguyên màu chữ */
-    }
+.nav-link:hover {
+    background-color: #e9ecef;
+    /* Màu xám nhạt */
+    color: #000;
+    /* Giữ nguyên màu chữ */
+}
 
-    .nav-link.active {
-        background-color: #073A4B;
-        color: white;
-    }
+.nav-link.active {
+    background-color: #073A4B;
+    color: white;
+}
 
-    .row {
-        display: flex;
-        justify-content: space-between;
-    }
+.row {
+    display: flex;
+    justify-content: space-between;
+}
 
-    .account-info {
-        display: flex;
-        align-items: center;
-        position: relative;
-    }
+.account-info {
+    display: flex;
+    align-items: center;
+    position: relative;
+}
 
-    .section-title {
-        font-size: 24px;
-        font-weight: bold;
-        margin-bottom: 20px;
-        position: relative;
-    }
+.section-title {
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 20px;
+    position: relative;
+}
 
-    .section-title::after {
-        content: '';
-        display: block;
-        width: 100px;
-        height: 4px;
-        background-color: rgb(9, 25, 208);
-        /* Màu hồng */
-        margin-top: 5px;
-    }
+.section-title::after {
+    content: '';
+    display: block;
+    width: 100px;
+    height: 4px;
+    background-color: rgb(9, 25, 208);
+    /* Màu hồng */
+    margin-top: 5px;
+}
 
-    .d-flex .form-control {
-        width: 150px;
-    }
+.d-flex .form-control {
+    width: 150px;
+}
 
-    #searchBtn {
-        height: 35px;
-        margin-top: 6px;
-        /* Điều chỉnh cho phù hợp */
-    }
+#searchBtn {
+    height: 35px;
+    margin-top: 6px;
+    /* Điều chỉnh cho phù hợp */
+}
 
-    .dropdown .btn {
-        width: 180px;
-        /* Độ rộng tương tự input */
-        text-align: left;
-        /* Canh trái nội dung */
-        background-color: white;
-        /* Màu nền giống input */
-        color: #495057;
-        /* Màu chữ mặc định của input */
-        border: 1px solid #ced4da;
-        /* Viền giống input */
-        padding: 0.375rem 0.75rem;
-        /* Padding giống input */
-        height: 38px;
-        /* Chiều cao giống input */
-        border-radius: 5px;
-        /* Bo góc tương tự input */
-        margin-top: 5px;
-    }
+.dropdown .btn {
+    width: 180px;
+    /* Độ rộng tương tự input */
+    text-align: left;
+    /* Canh trái nội dung */
+    background-color: white;
+    /* Màu nền giống input */
+    color: #495057;
+    /* Màu chữ mặc định của input */
+    border: 1px solid #ced4da;
+    /* Viền giống input */
+    padding: 0.375rem 0.75rem;
+    /* Padding giống input */
+    height: 38px;
+    /* Chiều cao giống input */
+    border-radius: 5px;
+    /* Bo góc tương tự input */
+    margin-top: 5px;
+}
 
-    /* Khi hover */
-    .dropdown .btn:hover,
-    .d-flex .form-control:hover {
-        background-color: #f8f9fa;
-        /* Giống input khi hover */
-        border-color: #bdbdbd;
-        /* Viền nhẹ hơn */
-    }
+/* Khi hover */
+.dropdown .btn:hover,
+.d-flex .form-control:hover {
+    background-color: #f8f9fa;
+    /* Giống input khi hover */
+    border-color: #bdbdbd;
+    /* Viền nhẹ hơn */
+}
 
-    /* Khi nhấn vào */
-    .dropdown .btn:focus,
-    .dropdown .btn:active,
-    .d-flex .form-control:focus,
-    .d-flex .form-control:active {
-        background-color: #fff;
-        border-color: #80bdff;
-        box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
-        /* Hiệu ứng focus */
-    }
+/* Khi nhấn vào */
+.dropdown .btn:focus,
+.dropdown .btn:active,
+.d-flex .form-control:focus,
+.d-flex .form-control:active {
+    background-color: #fff;
+    border-color: #80bdff;
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+    /* Hiệu ứng focus */
+}
 
-    /* Tạo dropdown menu đẹp hơn */
-    .dropdown-menu {
-        width: 180px;
-        /* Độ rộng dropdown bằng nút */
-    }
+/* Tạo dropdown menu đẹp hơn */
+.dropdown-menu {
+    width: 180px;
+    /* Độ rộng dropdown bằng nút */
+}
 
-    /* Định dạng item trong dropdown */
-    .dropdown-menu .dropdown-item {
-        padding: 8px 15px;
-    }
+/* Định dạng item trong dropdown */
+.dropdown-menu .dropdown-item {
+    padding: 8px 15px;
+}
 
-    /* Khi chọn một item */
-    .dropdown-menu .dropdown-item:hover {
-        background-color: #007bff;
-        color: white;
-    }
+/* Khi chọn một item */
+.dropdown-menu .dropdown-item:hover {
+    background-color: #007bff;
+    color: white;
+}
 
-    #searchBtn {
-        height: 35px;
-        margin-top: 6px;
-        /* Điều chỉnh cho phù hợp */
-    }
+#searchBtn {
+    height: 35px;
+    margin-top: 6px;
+    /* Điều chỉnh cho phù hợp */
+}
 </style>
 
 <div class="container-fluid">
@@ -264,7 +267,9 @@ include __DIR__ . '/../src/partials/header.php';
             include __DIR__ . '/hangsanxuat.php';
             include __DIR__ . '/khachhang.php';
             include __DIR__ . '/hoadon.php';
+            include __DIR__ . '/thongke.php';
             include __DIR__ . '/nhanvien.php';
+            
             ?>
 
             <!-- Thống kê danh thu -->
@@ -282,129 +287,161 @@ include __DIR__ . '/../src/partials/header.php';
 </div>
 
 <?php if (!empty($success_message)): ?>
-    <div id="success-alert" class="alert alert-success text-center">
-        <?php echo htmlspecialchars($success_message); ?>
-    </div>
+<div id="success-alert" class="alert alert-success text-center">
+    <?php echo htmlspecialchars($success_message); ?>
+</div>
 
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script>
-        $(document).ready(function () {
-            setTimeout(function () {
-                $("#success-alert").fadeOut(500);
-            }, 5000);
-        });
-    </script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+$(document).ready(function() {
+    setTimeout(function() {
+        $("#success-alert").fadeOut(500);
+    }, 5000);
+});
+</script>
 <?php endif; ?>
 
 <!-- Show -->
 <script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const menuItems = [
-            { linkId: 'showThuoc', sectionId: 'thuoc' },
-            { linkId: 'showLoai', sectionId: 'loai' },
-            { linkId: 'showHoadon', sectionId: 'hoaDon' },
-            { linkId: 'showThongKe', sectionId: 'thongKe' },
-            { linkId: 'showThongBao', sectionId: 'thongBao' },
-            { linkId: 'showNCC', sectionId: 'ncc' },
-            { linkId: 'showHSX', sectionId: 'hsx' },
-            { linkId: 'showNhapExcel', sectionId: 'nhapExcel' },
-            { linkId: 'showKhachHang', sectionId: 'khachHang' },
-            { linkId: 'showXuatFile', sectionId: 'xuatFile' },
-            { linkId: 'showNhanVien', sectionId: 'nhanVien' }
-        ];
-
-        function hideAllSections() {
-            menuItems.forEach(item => {
-                const section = document.getElementById(item.sectionId);
-                if (section) {
-                    section.style.display = 'none';
-                }
-            });
+document.addEventListener('DOMContentLoaded', function() {
+    const menuItems = [{
+            linkId: 'showThuoc',
+            sectionId: 'thuoc'
+        },
+        {
+            linkId: 'showLoai',
+            sectionId: 'loai'
+        },
+        {
+            linkId: 'showHoadon',
+            sectionId: 'hoaDon'
+        },
+        {
+            linkId: 'showThongKe',
+            sectionId: 'thongKe'
+        },
+        {
+            linkId: 'showThongBao',
+            sectionId: 'thongBao'
+        },
+        {
+            linkId: 'showNCC',
+            sectionId: 'ncc'
+        },
+        {
+            linkId: 'showHSX',
+            sectionId: 'hsx'
+        },
+        {
+            linkId: 'showNhapThuoc',
+            sectionId: 'nhapThuoc'
+        },
+        {
+            linkId: 'showKhachHang',
+            sectionId: 'khachHang'
+        },
+        {
+            linkId: 'showXuatFile',
+            sectionId: 'xuatFile'
+        },
+        {
+            linkId: 'showNhanVien',
+            sectionId: 'nhanVien'
         }
+    ];
 
-        function removeActiveClass() {
-            menuItems.forEach(item => {
-                const link = document.getElementById(item.linkId);
-                if (link) {
-                    link.classList.remove('active');
-                }
-            });
-        }
-
-        function showSection(sectionId, linkId) {
-            hideAllSections();
-            removeActiveClass();
-
-            const section = document.getElementById(sectionId);
-            const link = document.getElementById(linkId);
-
+    function hideAllSections() {
+        menuItems.forEach(item => {
+            const section = document.getElementById(item.sectionId);
             if (section) {
-                section.style.display = 'block';
+                section.style.display = 'none';
             }
-            if (link) {
-                link.classList.add('active');
-            }
+        });
+    }
 
-            // Lưu ID tab vào LocalStorage
-            localStorage.setItem("activeTab", sectionId);
-            localStorage.setItem("activeLink", linkId);
-
-            // Cập nhật URL chỉ còn "index.php"
-            history.replaceState(null, "", "index.php");
-        }
-
-        // Ẩn tất cả sections trước
-        hideAllSections();
-
-        // Lấy tab & menu sidebar active từ LocalStorage
-        const savedTab = localStorage.getItem("activeTab");
-        const savedLink = localStorage.getItem("activeLink");
-
-        // Nếu có tab được lưu => Hiển thị tab đó + active menu
-        if (savedTab && document.getElementById(savedTab) && savedLink && document.getElementById(savedLink)) {
-            showSection(savedTab, savedLink);
-        } else {
-            // Nếu không có tab nào lưu, mặc định mở tab "thuốc"
-            showSection('thuoc', 'showThuoc');
-        }
-
+    function removeActiveClass() {
         menuItems.forEach(item => {
             const link = document.getElementById(item.linkId);
             if (link) {
-                link.addEventListener('click', function (e) {
-                    e.preventDefault();
-                    showSection(item.sectionId, item.linkId);
-                });
+                link.classList.remove('active');
             }
         });
-    });
-</script>
+    }
 
-<script>
-    // Hiển thị thông báo đăng nhập thành công nếu có
-    document.addEventListener('DOMContentLoaded', function () {
-        <?php if (!empty($successMessage)): ?>
-            Swal.fire({
-                title: "Đăng nhập thành công!",
-                text: "<?php echo htmlspecialchars($successMessage); ?>",
-                icon: "success",
-                confirmButtonText: "OK"
+    function showSection(sectionId, linkId) {
+        hideAllSections();
+        removeActiveClass();
+
+        const section = document.getElementById(sectionId);
+        const link = document.getElementById(linkId);
+
+        if (section) {
+            section.style.display = 'block';
+        }
+        if (link) {
+            link.classList.add('active');
+        }
+
+        // Lưu ID tab vào LocalStorage
+        localStorage.setItem("activeTab", sectionId);
+        localStorage.setItem("activeLink", linkId);
+
+        // Cập nhật URL chỉ còn "index.php"
+        history.replaceState(null, "", "index.php");
+    }
+
+    // Ẩn tất cả sections trước
+    hideAllSections();
+
+    // Lấy tab & menu sidebar active từ LocalStorage
+    const savedTab = localStorage.getItem("activeTab");
+    const savedLink = localStorage.getItem("activeLink");
+
+    // Nếu có tab được lưu => Hiển thị tab đó + active menu
+    if (savedTab && document.getElementById(savedTab) && savedLink && document.getElementById(savedLink)) {
+        showSection(savedTab, savedLink);
+    } else {
+        // Nếu không có tab nào lưu, mặc định mở tab "thuốc"
+        showSection('thuoc', 'showThuoc');
+    }
+
+    menuItems.forEach(item => {
+        const link = document.getElementById(item.linkId);
+        if (link) {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                showSection(item.sectionId, item.linkId);
             });
-        <?php endif; ?>
+        }
     });
+});
 </script>
 
 <script>
-    // Tự động ẩn thông báo sau 1 giây
-    setTimeout(function () {
-        let alerts = document.querySelectorAll(".alert-message");
+// Hiển thị thông báo đăng nhập thành công nếu có
+document.addEventListener('DOMContentLoaded', function() {
+    <?php if (!empty($successMessage)): ?>
+    Swal.fire({
+        title: "Đăng nhập thành công!",
+        text: "<?php echo htmlspecialchars($successMessage); ?>",
+        icon: "success",
+        confirmButtonText: "OK"
+    });
+    <?php endif; ?>
+});
+</script>
 
-        alerts.forEach(function (alert) {
-            alert.style.transition = "opacity 0.5s";
-            alert.style.opacity = "0";
-            setTimeout(() => alert.style.display = "none", 500);
-        });
-    }, 1000); // 1000ms = 1 giây
+<script>
+// Tự động ẩn thông báo sau 1 giây
+setTimeout(function() {
+    let alerts = document.querySelectorAll(".alert-message");
+
+    alerts.forEach(function(alert) {
+        alert.style.transition = "opacity 0.5s";
+        alert.style.opacity = "0";
+        setTimeout(() => alert.style.display = "none", 500);
+    });
+}, 1000); // 1000ms = 1 giây
 </script>
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
