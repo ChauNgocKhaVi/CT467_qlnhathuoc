@@ -1,3 +1,18 @@
+<!-- Chạy lệnh vào thư mục gốc của dự án: composer require phpoffice/phpspreadsheet -->
+<!--  Nếu chạy không được thì
+Mở file php.ini trong thư mục C:\xampp\php\php.ini hoặc C:\Program Files\PHP\php.ini.
+Tìm và bỏ dấu ; trước các dòng:
+extension=gd
+extension=zip
+
+Tắt xampp bật lại
+Chạy lại lệnh composer require phpoffice/phpspreadsheet
+-->
+
+<!-- 
+Đã có thư mục vendor, nhưng nếu autoload.php
+ chạy lệnh:  composer dump-autoload
+-->
 <?php
 require_once __DIR__ . '/../vendor/autoload.php'; // Nạp thư viện PhpSpreadsheet
 require_once __DIR__ . '/../src/bootstrap.php';
