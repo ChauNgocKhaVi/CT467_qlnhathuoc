@@ -1,9 +1,13 @@
+<?php // Lấy tổng số lượng thuốc của mã loại 1
+$tongSoLuong = tongSoLuongThuocTheoLoai($pdo, 1);
+?>
+
 <!-- Loại thuốc -->
 <div class="container-fluid-fluid" id="loai">
     <h2 class="section-title bg-light p-2 rounded potta-one-regular">Danh Sách Loại</h2>
     <!-- Hiển thị thông báo -->
     <?php if (!empty($successLoai)): ?>
-    <div class="alert alert-success alert-message"><?php echo htmlspecialchars($successLoai); ?></div>
+        <div class="alert alert-success alert-message"><?php echo htmlspecialchars($successLoai); ?></div>
     <?php endif; ?>
     <div class="d-flex justify-content-between align-items-center mb-3">
         <!-- Tìm kiếm -->
@@ -31,13 +35,14 @@
             </tr>
         </thead>
         <tbody>
-            <?php foreach ($loaiList as $loai): ?>
+            <?php foreach ($loaiList as $loai):
+                $TongSoLuong = tongSoLuongThuocTheoLoai($pdo, $loai['MaLoai']); 
+                ?>
                 <tr>
                     <td class="text-center"><?php echo htmlspecialchars($loai['MaLoai']); ?></td>
                     <td class="text-center"><?php echo htmlspecialchars($loai['TenLoai']); ?></td>
                     <td class="text-center"><?php echo htmlspecialchars($loai['DonViTinh']); ?></td>
-                    <!-- Hiển thị số lượng thuốc trong kho -->
-                    <td class="text-center"><?php echo $loai['TongSoLuong']; ?></td>
+                    <td class="text-center"><?php echo number_format($TongSoLuong); ?></td> <!-- Định dạng số lượng -->
                     <td>
                         <a href="edit_loai.php?MaLoai=<?php echo $loai['MaLoai']; ?>" class="btn btn-primary">Sửa</a>
                         <a href="delete_loai.php?MaLoai=<?php echo $loai['MaLoai']; ?>" class="btn btn-danger"
@@ -49,34 +54,34 @@
     </table>
 </div>
 <script>
-document.addEventListener("DOMContentLoaded", function() {
-    // Lấy tất cả các ô input
-    let inputs = document.querySelectorAll("#maloai, #tenloai, #DonViTinh");
+    document.addEventListener("DOMContentLoaded", function () {
+        // Lấy tất cả các ô input
+        let inputs = document.querySelectorAll("#maloai, #tenloai, #DonViTinh");
 
-    // Gắn sự kiện 'input' cho từng ô
-    inputs.forEach(input => {
-        input.addEventListener("input", function() {
-            let maloai = document.getElementById("maloai").value.trim().toLowerCase();
-            let tenloai = document.getElementById("tenloai").value.trim().toLowerCase();
-            let donvitinh = document.getElementById("DonViTinh").value.trim().toLowerCase();
+        // Gắn sự kiện 'input' cho từng ô
+        inputs.forEach(input => {
+            input.addEventListener("input", function () {
+                let maloai = document.getElementById("maloai").value.trim().toLowerCase();
+                let tenloai = document.getElementById("tenloai").value.trim().toLowerCase();
+                let donvitinh = document.getElementById("DonViTinh").value.trim().toLowerCase();
 
-            let rows = document.querySelectorAll("tbody tr");
+                let rows = document.querySelectorAll("tbody tr");
 
-            rows.forEach(row => {
-                let maLoaiText = row.cells[0]?.textContent.trim().toLowerCase() || "";
-                let tenLoaiText = row.cells[1]?.textContent.trim().toLowerCase() || "";
-                let donViTinhText = row.cells[2]?.textContent.trim().toLowerCase() ||
-                "";
+                rows.forEach(row => {
+                    let maLoaiText = row.cells[0]?.textContent.trim().toLowerCase() || "";
+                    let tenLoaiText = row.cells[1]?.textContent.trim().toLowerCase() || "";
+                    let donViTinhText = row.cells[2]?.textContent.trim().toLowerCase() ||
+                        "";
 
-                let matchMaLoai = maloai === "" || maLoaiText.includes(maloai);
-                let matchTenLoai = tenloai === "" || tenLoaiText.includes(tenloai);
-                let matchDonViTinh = donvitinh === "" || donViTinhText.includes(
-                    donvitinh);
+                    let matchMaLoai = maloai === "" || maLoaiText.includes(maloai);
+                    let matchTenLoai = tenloai === "" || tenLoaiText.includes(tenloai);
+                    let matchDonViTinh = donvitinh === "" || donViTinhText.includes(
+                        donvitinh);
 
-                row.style.display = (matchMaLoai && matchTenLoai && matchDonViTinh) ?
-                    "" : "none";
+                    row.style.display = (matchMaLoai && matchTenLoai && matchDonViTinh) ?
+                        "" : "none";
+                });
             });
         });
     });
-});
 </script>

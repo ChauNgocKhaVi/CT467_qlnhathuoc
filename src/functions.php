@@ -210,8 +210,10 @@ function layTatCaLoaiThuoc(PDO $pdo): array
 function tongSoLuongThuocTheoLoai(PDO $pdo, $maLoai)
 {
     try {
-        // Câu lệnh SQL gọi Stored Function
+        // Gọi hàm trong cơ sở dữ liệu để lấy tổng số lượng thuốc theo mã loại
         $stmt = $pdo->prepare("SELECT tong_so_luong_thuoc_theo_loai(:maLoai) AS tongSoLuong");
+
+        // Liên kết tham số vào câu truy vấn
         $stmt->bindParam(':maLoai', $maLoai, PDO::PARAM_INT);
 
         // Thực thi câu lệnh SQL
@@ -220,13 +222,15 @@ function tongSoLuongThuocTheoLoai(PDO $pdo, $maLoai)
         // Lấy kết quả và trả về
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        return $result['tongSoLuong'] ?? 0;  // Trả về tổng số lượng hoặc 0 nếu không có kết quả
+        // Kiểm tra và trả về tổng số lượng thuốc hoặc 0 nếu không có kết quả
+        return $result['tongSoLuong'] ?? 0;
     } catch (PDOException $e) {
         // Nếu có lỗi, ghi lại lỗi và trả về 0
         error_log("Lỗi khi gọi Stored Function: " . $e->getMessage());
         return 0;
     }
 }
+
 
 // --------------------- LẤY NHÀ CUNG CẤP ---------------------
 
