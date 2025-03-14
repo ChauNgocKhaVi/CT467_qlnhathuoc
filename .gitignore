@@ -1,0 +1,12 @@
+# Bỏ qua thư mục vendor
+vendor/
+
+# Bỏ qua file Composer
+composer.lock
+composer.json
+
+# Bỏ qua các file hệ thống và IDE
+.idea/
+.vscode/
+.DS_Store
+node_modules/
