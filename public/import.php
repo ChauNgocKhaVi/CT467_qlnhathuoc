@@ -21,10 +21,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && !empty($_POST['import'])) {
 
     $results = [];
 
-    // Thay đổi thứ tự nhập
     foreach ($importTables as $table) {
         switch ($table) {
-            // Nhập loại thuốc, nhà cung cấp, hãng sản xuất trước
             case 'loai':
                 $sheet = $spreadsheet->getSheetByName("Loại Thuốc");
                 if ($sheet) {
@@ -40,7 +38,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && !empty($_POST['import'])) {
                 break;
 
             case 'hangsanxuat':
-                $sheet = $spreadsheet->getSheetByName("Hãng Sản Xuất");
+                $sheet = $spreadsheet->getSheetByName("Hãng SX");
                 if ($sheet) {
                     $results[$table] = importHangSanXuat($pdo, $sheet);
                 }
@@ -66,7 +64,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && !empty($_POST['import'])) {
 
     // Lưu thông báo thành công vào session
     $_SESSION['success_message_import'] = "Đã nhập thành công!";
-    echo "Thêm thành công"; // Xem thông tin được thêm
+
+    // Chuyển hướng về trang index.php
+    header("Location: index.php");
     exit;
 }
 ?>

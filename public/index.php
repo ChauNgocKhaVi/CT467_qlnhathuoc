@@ -233,8 +233,7 @@ include __DIR__ . '/../src/partials/header.php';
                                 hạn</strong></a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#nhapExcel" id="showNhapExcel"><strong>Nhập thuốc từ
-                                Excel</strong></a>
+                        <a class="nav-link" href="#nhapExcel" id="showNhapExcel"><strong>Nhập từ file Excel</strong></a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="#xuatFile" id="showXuatFile"><strong>Xuất file </strong></a>
