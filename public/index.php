@@ -51,6 +51,7 @@ $chiTietHD = layChiTietHoaDon($pdo, $maHD);
 $thongKeList = [];
 try {
 $stmt = $pdo->prepare("CALL ThongKeDoanhThu()");
+
 $stmt->execute();
 $thongKeList = $stmt->fetchAll(PDO::FETCH_ASSOC);
 } catch (Exception $e) {
