@@ -1,16 +1,20 @@
--- Lấy tổng số lượng thuốc trong kho
+-- Lấy tổng số lượng thuốc trong kho của một loại thuốc
 DELIMITER $$
-CREATE FUNCTION tong_so_luong_thuoc() 
+
+CREATE FUNCTION tong_so_luong_thuoc_theo_loai(maLoai INT) 
 RETURNS INT 
 DETERMINISTIC
 BEGIN
     DECLARE tong INT;
-    SELECT SUM(SoLuongTon) INTO tong FROM Thuoc;
+    -- Lấy tổng số lượng thuốc trong kho của loại thuốc cụ thể
+    SELECT SUM(SoLuongTon) INTO tong 
+    FROM Thuoc
+    WHERE MaLoai = maLoai;
+    
     RETURN tong;
 END $$
-DELIMITER ;
 
-SELECT tong_so_luong_thuoc();
+DELIMITER ;
 
 -- Kiểm tra số lượng thuốc theo mã
 DELIMITER $$

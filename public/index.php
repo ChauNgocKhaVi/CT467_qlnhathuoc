@@ -21,6 +21,13 @@ $vaitro = ($_SESSION['VaiTro']);
 
 $thuocList = layTatCaThuoc($pdo); // Gọi hàm lấy danh sách thuốc
 $loaiList = layTatCaLoaiThuoc($pdo); // Gọi hàm lấy danh sách loại thuốc
+
+foreach ($loaiList as &$loai) { // Dùng tham chiếu (&)
+    // Gọi hàm để lấy tổng số lượng thuốc trong kho cho loại này
+    $tongSoLuong = tongSoLuongThuocTheoLoai($pdo, $loai['MaLoai']);
+    $loai['TongSoLuong'] = $tongSoLuong; // Lưu kết quả vào mảng $loai
+}
+unset($loai); // Đảm bảo không còn tham chiếu sau vòng lặp
 $nccList = layTatCaNhaCungCap($pdo); // Gọi hàm lấy danh sách nhà cung cấp
 $hsxList = layTatCaHangSanXuat($pdo); // Gọi hàm lấy danh sách hãng sản xuất
 $KHList = layTatCaKhachHang($pdo); // Gọi hàm lấy danh sách khách hàng

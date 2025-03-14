@@ -24,8 +24,9 @@
         <thead class="thead-dark">
             <tr>
                 <th class="text-center">Mã Loại</th>
-                <th>Tên Loại</th>
-                <th>Đơn vị tính</th>
+                <th class="text-center">Tên Loại</th>
+                <th class="text-center">Đơn vị tính</th>
+                <th class="text-center">Số lượng thuốc trong kho</th>
                 <th>Hành động</th>
             </tr>
         </thead>
@@ -33,14 +34,15 @@
             <?php foreach ($loaiList as $loai): ?>
                 <tr>
                     <td class="text-center"><?php echo htmlspecialchars($loai['MaLoai']); ?></td>
-                    <td><?php echo htmlspecialchars($loai['TenLoai']); ?></td>
-                    <td><?php echo htmlspecialchars($loai['DonViTinh']); ?></td>
+                    <td class="text-center"><?php echo htmlspecialchars($loai['TenLoai']); ?></td>
+                    <td class="text-center"><?php echo htmlspecialchars($loai['DonViTinh']); ?></td>
+                    <!-- Hiển thị số lượng thuốc trong kho -->
+                    <td class="text-center"><?php echo $loai['TongSoLuong']; ?></td>
                     <td>
                         <a href="edit_loai.php?MaLoai=<?php echo $loai['MaLoai']; ?>" class="btn btn-primary">Sửa</a>
                         <a href="delete_loai.php?MaLoai=<?php echo $loai['MaLoai']; ?>" class="btn btn-danger"
                             onclick="return confirm('Bạn có chắc chắn muốn xóa?');">Xóa</a>
                     </td>
-
                 </tr>
             <?php endforeach; ?>
         </tbody>
