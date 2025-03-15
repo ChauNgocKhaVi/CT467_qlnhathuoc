@@ -24,19 +24,19 @@
         <table class="table table-striped">
             <thead class="thead-dark">
                 <tr>
-                    <th>Mã Hóa Đơn</th>
+                    <th class="text-center">Mã Hóa Đơn</th>
                     <th>Tên Khách Hàng</th>
                     <th>Số Điện Thoại</th>
                     <th>Ngày Lập</th>
                     <th>Tổng tiền</th>
-                    <th>Chi Tiết</th>
-                    <th>Hành động</th>
+                    <th class="text-center">Chi Tiết</th>
+                    <th class="text-center">Hành động</th>
                 </tr>
             </thead>
             <tbody>
                 <?php foreach ($hoadonList as $hoadon): ?>
                 <tr>
-                    <td><?php echo htmlspecialchars($hoadon['MaHD']); ?></td>
+                    <td class="text-center"><?php echo htmlspecialchars($hoadon['MaHD']); ?></td>
                     <td><?php echo htmlspecialchars($hoadon['TenKH']); ?></td>
                     <td><?php echo htmlspecialchars($hoadon['SoDienThoai']); ?></td>
                     <td><?php echo htmlspecialchars($hoadon['NgayLap']); ?></td>
@@ -48,7 +48,7 @@
                             Xem chi tiết
                         </button>
                     </td>
-                    <td>
+                    <td class="text-center">
                         <a href="edit_hoadon.php?MaHD=<?php echo $hoadon['MaHD']; ?>" class="btn btn-primary">Sửa</a>
                         <a href="delete_hoadon.php?MaHD=<?php echo $hoadon['MaHD']; ?>" class="btn btn-danger"
                             onclick="return confirm('Bạn có chắc chắn muốn xóa hóa đơn này?')">Xóa </a>

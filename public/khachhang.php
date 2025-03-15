@@ -27,6 +27,7 @@
                 <th class="text-center">Mã Khách Hàng</th>
                 <th>Tên Khách Hàng</th>
                 <th>Số Điện Thoại</th>
+                <th>Địa chỉ</th>
                 <th>Hành động</th>
             </tr>
         </thead>
@@ -36,6 +37,7 @@
                 <td class="text-center"><?php echo htmlspecialchars($KH['MaKH']); ?></td>
                 <td><?php echo htmlspecialchars($KH['TenKH']); ?></td>
                 <td><?php echo htmlspecialchars($KH['SoDienThoai']); ?></td>
+                <td><?php echo htmlspecialchars($KH['DiaChi']); ?></td>
                 <td>
                     <a href="edit_khachHang.php?MaKH=<?php echo $KH['MaKH']; ?>" class="btn btn-primary">Sửa</a>
                     <a href="delete_khachHang.php?MaKH=<?php echo $KH['MaKH']; ?>" class="btn btn-danger"
