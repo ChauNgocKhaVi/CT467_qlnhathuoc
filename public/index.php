@@ -1,4 +1,5 @@
 <?php
+
 session_start();
 require_once __DIR__ . '/../src/bootstrap.php';
 require_once __DIR__ . '/../src/functions.php';
@@ -38,16 +39,16 @@ $thuocSapHetHanIds = array_column($thuocSapHetHan, 'MaThuoc'); // Lấy danh sá
 $searchTenKH = isset($_GET['TenKH']) ? trim($_GET['TenKH']) : '';
 $hoadonList = layHoaDonBanThuoc($pdo);
 
-// Gọi stored procedure ThongKeDoanhThu
-$thongKeList = [];
-try {
-$stmt = $pdo->prepare("CALL ThongKeDoanhThu()");
+$chiTietHD = [];
+$maHD = '';
 
-$stmt->execute();
-$thongKeList = $stmt->fetchAll(PDO::FETCH_ASSOC);
-} catch (Exception $e) {
-echo "Lỗi truy vấn thống kê: " . $e->getMessage();
+if (isset($_GET['MaHD']) && !empty($_GET['MaHD'])) {
+$maHD = $_GET['MaHD'];
+$chiTietHD = layChiTietHoaDon($pdo, $maHD);
 }
+
+$kieuThongKe = isset($_GET['type']) ? $_GET['type'] : 'ngay';
+$thongKeList = thongKeDoanhThu($pdo, $kieuThongKe);
 
 $successLoai = $_GET['successLoai'] ?? ''; // Lấy thông báo thành công
 $successNCC = $_GET['successNCC'] ?? ''; // Lấy thông báo thành công
