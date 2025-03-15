@@ -38,15 +38,6 @@ $thuocSapHetHanIds = array_column($thuocSapHetHan, 'MaThuoc'); // Lấy danh sá
 $searchTenKH = isset($_GET['TenKH']) ? trim($_GET['TenKH']) : '';
 $hoadonList = layHoaDonBanThuoc($pdo);
 
-
-
-$chiTietHD = [];
-$maHD = '';
-
-if (isset($_GET['MaHD']) && !empty($_GET['MaHD'])) {
-$maHD = $_GET['MaHD'];
-$chiTietHD = layChiTietHoaDon($pdo, $maHD);
-}
 // Gọi stored procedure ThongKeDoanhThu
 $thongKeList = [];
 try {
