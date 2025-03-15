@@ -7,26 +7,56 @@
     <?php endif; ?>
 
     <div class="d-flex justify-content-between align-items-center mb-3">
+        <!-- Dropdown menu chọn kiểu thống kê -->
+        <div class="dropdown">
+            <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton"
+                data-bs-toggle="dropdown" aria-expanded="false">
+                Chọn kiểu thống kê
+            </button>
+            <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                <li><a class="dropdown-item" href="#" data-type="ngay">Theo Ngày</a></li>
+                <li><a class="dropdown-item" href="#" data-type="tuan">Theo Tuần</a></li>
+                <li><a class="dropdown-item" href="#" data-type="thang">Theo Tháng</a></li>
+            </ul>
+        </div>
+
         <!-- Tìm kiếm theo khoảng thời gian -->
         <div class="d-flex">
             <button id="filterBtn" class="btn btn-primary me-2 mt-2">Tìm kiếm</button>
             <input type="date" id="startDate" class="form-control me-2" />
             <input type="date" id="endDate" class="form-control me-2" />
-
         </div>
     </div>
 
     <table class="table table-striped">
         <thead class="thead-dark">
             <tr>
-                <th class="text-center">Ngày</th>
+                <th class="text-center">
+                    <?php 
+                        if ($kieuThongKe == 'ngay') echo "Ngày";
+                        elseif ($kieuThongKe == 'tuan') echo "Tuần";
+                        elseif ($kieuThongKe == 'thang') echo "Tháng - Năm";
+                    ?>
+                </th>
                 <th class="text-center">Doanh Thu</th>
             </tr>
         </thead>
         <tbody id="thongKeTable">
             <?php foreach ($thongKeList as $thongke): ?>
             <tr>
-                <td class="text-center"><?php echo date('Y-m-d', strtotime($thongke['Ngay'])); ?></td>
+                <td class="text-center">
+                    <?php
+                        if ($kieuThongKe == 'ngay') {
+                            echo date('Y-m-d', strtotime($thongke['ThoiGian'])); 
+                        } elseif ($kieuThongKe == 'tuan' && isset($thongke['Tuan'])) {
+                            echo "Tuần " . $thongke['Tuan'] . " (" . date('d/m', strtotime($thongke['NgayBatDau'])) . " - " . date('d/m', strtotime($thongke['NgayKetThuc'])) . ")";
+                        } elseif ($kieuThongKe == 'thang') {
+                            echo "Tháng " . $thongke['Thang'] . " Năm " . $thongke['Nam'];
+                        } else {
+                            echo "Không có dữ liệu";
+                        }
+                    ?>
+                </td>
                 <td class="text-center"><?php echo number_format($thongke['DoanhThu'], 0, ',', '.'); ?> VND</td>
             </tr>
             <?php endforeach; ?>
@@ -37,21 +67,29 @@
 
 <script>
 document.addEventListener("DOMContentLoaded", function() {
+    // Xử lý sự kiện khi chọn kiểu thống kê
+    document.querySelectorAll(".dropdown-item").forEach(item => {
+        item.addEventListener("click", function(e) {
+            e.preventDefault();
+            let type = this.getAttribute("data-type");
+
+            // Cập nhật URL và reload trang
+            let url = new URL(window.location.href);
+            url.searchParams.set("type", type);
+            window.location.href = url.toString();
+        });
+    });
+
+
+    // Lọc dữ liệu theo ngày
     document.getElementById("filterBtn").addEventListener("click", function() {
         let startDate = document.getElementById("startDate").value;
         let endDate = document.getElementById("endDate").value;
         let rows = document.querySelectorAll("#thongKeTable tr");
 
-        console.log("Start Date:", startDate);
-        console.log("End Date:", endDate);
-
         rows.forEach(row => {
-            let dateText = row.cells[0].textContent
-                .trim(); // Lấy ngày từ cột đầu tiên (đã chuẩn hóa YYYY-MM-DD)
-            let rowDate = new Date(dateText); // Chuyển thành đối tượng Date hợp lệ
-
-            console.log("Row Date:", rowDate);
-
+            let dateText = row.cells[0].textContent.trim();
+            let rowDate = new Date(dateText);
             let isValid = true;
 
             if (startDate) {
