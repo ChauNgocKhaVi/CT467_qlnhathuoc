@@ -177,7 +177,7 @@ function layHoaDonBanThuoc(PDO $pdo): array
     $query = "SELECT hd.MaHD, kh.TenKH, kh.SoDienThoai, hd.NgayLap, hd.TongTien 
             FROM HoaDon hd 
             LEFT JOIN KhachHang kh ON hd.MaKH = kh.MaKH 
-            ORDER BY hd.NgayLap DESC";
+            ORDER BY hd.NgayLap ASC";
     $stmt = $pdo->query($query);
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
