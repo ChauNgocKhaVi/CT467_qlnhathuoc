@@ -74,10 +74,6 @@ BEGIN
     SELECT SUM(TongTien) INTO doanhThuTrongNgay
     FROM hoadon
     WHERE DATE(NgayLap) = DATE(NEW.NgayLap);
-
-    -- Bạn có thể thực hiện hành động khác, ví dụ:
-    -- In ra doanh thu của ngày đó (hoặc có thể xử lý ở ứng dụng khác)
-    -- Trigger không thể trả về kết quả nhưng có thể sử dụng kết quả này trong các logic tiếp theo
 END $$
 
 DELIMITER ;
