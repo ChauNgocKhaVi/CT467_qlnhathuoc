@@ -52,26 +52,33 @@ function validateInput(string $tenDangNhap, string $email, string $matKhau, stri
 }
 
 // --------------------- ĐĂNG KÝ NGƯỜI DÙNG ---------------------
-function dangKy(PDO $pdo, string $hoTen, string $tenDangNhap, string $matKhau, string $email, string $soDienThoai): string|bool
+function dangKy(PDO $pdo, string $hoTen, string $tenDangNhap, string $matKhau, string $email, string $soDienThoai): string
 {
-    // Mã hóa mật khẩu trước khi gửi vào Stored Procedure
-    $hashed_password = password_hash($matKhau, PASSWORD_DEFAULT);
+    try {
+        // Mã hóa mật khẩu trước khi gửi vào Stored Procedure
+        $hashed_password = password_hash($matKhau, PASSWORD_DEFAULT);
 
-    // Gọi Stored Procedure DangKy
-    $query = "CALL DangKy(:hoTen, :tenDangNhap, :email, :soDienThoai, :matKhau, @KetQua)";
-    $stmt = $pdo->prepare($query);
-    $stmt->bindParam(':hoTen', $hoTen);
-    $stmt->bindParam(':tenDangNhap', $tenDangNhap);
-    $stmt->bindParam(':email', $email);
-    $stmt->bindParam(':soDienThoai', $soDienThoai);
-    $stmt->bindParam(':matKhau', $hashed_password);
+        // Gọi Stored Procedure DangKy
+        $query = "CALL DangKy(:hoTen, :tenDangNhap, :email, :soDienThoai, :matKhau, @KetQua)";
+        $stmt = $pdo->prepare($query);
+        $stmt->bindParam(':hoTen', $hoTen);
+        $stmt->bindParam(':tenDangNhap', $tenDangNhap);
+        $stmt->bindParam(':email', $email);
+        $stmt->bindParam(':soDienThoai', $soDienThoai);
+        $stmt->bindParam(':matKhau', $hashed_password);
 
-    if ($stmt->execute()) {
-        // Lấy kết quả trả về từ biến @KetQua
+        $stmt->execute();
+
+        // Lấy kết quả từ Stored Procedure
         $result = $pdo->query("SELECT @KetQua AS KetQua")->fetch(PDO::FETCH_ASSOC);
+
         return $result['KetQua']; // Trả về thông báo từ Stored Procedure
-    } else {
-        return 'Lỗi đăng ký, vui lòng thử lại!';
+    } catch (PDOException $e) {
+        // Nếu lỗi từ trigger trong MySQL (SQLSTATE[45000])
+        if ($e->getCode() == '45000') {
+            return 'Lỗi từ cơ sở dữ liệu: ' . $e->getMessage();
+        }
+        return 'Lỗi hệ thống: ' . $e->getMessage();
     }
 }
 
@@ -692,7 +699,8 @@ function importKhachHang(PDO $pdo, $sheet)
 }
 
 // Thống kê doanh thu
-function thongKeDoanhThu($pdo, $kieuThongKe) {
+function thongKeDoanhThu($pdo, $kieuThongKe)
+{
     $thongKeList = [];
     try {
         $stmt = $pdo->prepare("CALL ThongKeDoanhThu(:kieuThongKe)");
@@ -705,7 +713,8 @@ function thongKeDoanhThu($pdo, $kieuThongKe) {
     return $thongKeList;
 }
 
-function hienThiThongKe($title, $data) {
+function hienThiThongKe($title, $data)
+{
     echo "<h2>$title</h2>";
     echo "<table border='1' cellpadding='5' cellspacing='0'>";
     if (!empty($data)) {

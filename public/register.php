@@ -38,8 +38,13 @@ include __DIR__ . '/../src/partials/head.php';
 <div class="container d-flex justify-content-center align-items-center mt-3" style="min-height: 80vh;">
     <div class="card shadow-lg p-4 rounded" style="max-width: 600px; width: 100%;">
         <h2 class="text-center mb-4">Đăng Ký</h2>
+        <?php if (!empty($error)): ?>
+            <div class="alert alert-danger text-center"><?= $error; ?></div>
+        <?php endif; ?>
 
-
+        <?php if (!empty($success)): ?>
+            <div class="alert alert-success text-center"><?= $success; ?></div>
+        <?php endif; ?>
 
         <form method="POST" action="" enctype="multipart/form-data">
             <div class="mb-3">
