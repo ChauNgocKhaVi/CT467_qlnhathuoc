@@ -691,4 +691,40 @@ function importKhachHang(PDO $pdo, $sheet)
     return "Đã nhập " . count($data) . " khách hàng.";
 }
 
+// Thống kê doanh thu
+function thongKeDoanhThu($pdo, $kieuThongKe) {
+    $thongKeList = [];
+    try {
+        $stmt = $pdo->prepare("CALL ThongKeDoanhThu(:kieuThongKe)");
+        $stmt->bindParam(":kieuThongKe", $kieuThongKe, PDO::PARAM_STR);
+        $stmt->execute();
+        $thongKeList = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    } catch (Exception $e) {
+        echo "Lỗi truy vấn thống kê: " . $e->getMessage();
+    }
+    return $thongKeList;
+}
+
+function hienThiThongKe($title, $data) {
+    echo "<h2>$title</h2>";
+    echo "<table border='1' cellpadding='5' cellspacing='0'>";
+    if (!empty($data)) {
+        echo "<tr>";
+        foreach (array_keys($data[0]) as $col) {
+            echo "<th>$col</th>";
+        }
+        echo "</tr>";
+
+        foreach ($data as $row) {
+            echo "<tr>";
+            foreach ($row as $value) {
+                echo "<td>$value</td>";
+            }
+            echo "</tr>";
+        }
+    } else {
+        echo "<tr><td colspan='3'>Không có dữ liệu</td></tr>";
+    }
+    echo "</table>";
+}
 ?>
