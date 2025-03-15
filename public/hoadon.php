@@ -51,7 +51,7 @@
                     <td>
                         <a href="edit_hoadon.php?MaHD=<?php echo $hoadon['MaHD']; ?>" class="btn btn-primary">Sửa</a>
                         <a href="delete_hoadon.php?MaHD=<?php echo $hoadon['MaHD']; ?>" class="btn btn-danger"
-                            onclick="return confirm('Bạn có chắc chắn muốn xóa hóa đơn này?');">Xóa</a>
+                            onclick="return confirm('Bạn có chắc chắn muốn xóa hóa đơn này?')">Xóa </a>
                     </td>
 
                 </tr>

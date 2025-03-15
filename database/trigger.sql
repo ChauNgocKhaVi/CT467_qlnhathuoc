@@ -51,6 +51,34 @@ BEGIN
 END$$
 
 
+-- Cập nhật doanh thu khi thêm hóa đơn
+DELIMITER $$
+
+CREATE TRIGGER capNhatDoanhThuSauKhiThemHD
+AFTER INSERT ON hoadon
+FOR EACH ROW
+BEGIN
+    -- Khai báo biến để lưu doanh thu của hóa đơn mới
+    DECLARE doanhThu DECIMAL(15, 2);
+    DECLARE doanhThuTrongNgay DECIMAL(15, 2);
+
+    -- Gán giá trị doanh thu từ hóa đơn mới
+    SET doanhThu = NEW.TongTien;
+
+    -- Tính tổng doanh thu trong ngày
+    SELECT SUM(TongTien) INTO doanhThuTrongNgay
+    FROM hoadon
+    WHERE DATE(NgayLap) = DATE(NEW.NgayLap);
+
+    -- Bạn có thể thực hiện hành động khác, ví dụ:
+    -- In ra doanh thu của ngày đó (hoặc có thể xử lý ở ứng dụng khác)
+    -- Trigger không thể trả về kết quả nhưng có thể sử dụng kết quả này trong các logic tiếp theo
+END $$
+
+DELIMITER ;
+
+
+
 
 
 

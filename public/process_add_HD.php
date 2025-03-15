@@ -54,7 +54,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $stmt->execute([$tongTien, $maHD]);
 
         $pdo->commit(); // Xác nhận transaction
-
+        
         header("Location: index.php?success=1");
         exit();
     } catch (Exception $e) {
@@ -65,4 +65,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     header("Location: index.php");
     exit();
 }
+
+
 ?>

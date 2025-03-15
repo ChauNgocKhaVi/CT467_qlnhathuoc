@@ -8,7 +8,7 @@ include __DIR__ . '/../src/partials/head.php';
 $type = $_GET['id'] ?? ''; // Nếu không có tham số 'type' thì mặc định là 'thuoc'
 
 // Lấy danh sách thuốc từ CSDL
-$stmtThuoc = $pdo->query("SELECT MaThuoc, TenThuoc FROM Thuoc");
+$stmtThuoc = $pdo->query("SELECT MaThuoc, TenThuoc, DonGia FROM Thuoc");
 $thuocList = $stmtThuoc->fetchAll(PDO::FETCH_ASSOC);
 
 // Lấy danh sách Loại Thuốc
@@ -26,6 +26,9 @@ $nccList = $stmtNCC->fetchAll(PDO::FETCH_ASSOC);
 // Lấy danh sách khách hàng từ CSDL
 $stmt = $pdo->query("SELECT MaKH, TenKH FROM KhachHang ORDER BY TenKH ASC");
 $khachHangs = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+
+
 
 ?>
 
@@ -227,24 +230,25 @@ $khachHangs = $stmt->fetchAll(PDO::FETCH_ASSOC);
         <label class="form-label">Chọn Thuốc</label>
         <div id="thuocContainer">
             <div class="thuoc-row d-flex gap-2 mb-2">
-                <select class="form-control w-50" name="MaThuoc[]">
+                <select class="form-control w-25" name="MaThuoc[]" onchange="updateDonGia(this)">
                     <option value="">-- Chọn Thuốc --</option>
                     <?php foreach ($thuocList as $thuoc): ?>
-                    <option value="<?= $thuoc['MaThuoc'] ?>">
+                    <option value="<?= $thuoc['MaThuoc'] ?>" data-dongia="<?= $thuoc['DonGia'] ?>">
                         <?= htmlspecialchars($thuoc['TenThuoc']) ?>
                     </option>
                     <?php endforeach; ?>
                 </select>
+                <input type="text" class="form-control w-25" name="DonGia[]" placeholder="Đơn Giá" readonly>
                 <input type="number" class="form-control w-25" name="SoLuongBan[]" placeholder="Số lượng" min="1"
                     required>
                 <input type="number" class="form-control w-25" name="GiaBan[]" placeholder="Giá bán" min="0" step="0.01"
                     required>
-                <button type="button" class="mt-2 btn btn-danger btn-remove-x "
-                    onclick="removeThuocRow(this)">X</button>
+                <button type="button" class="mt-2 btn btn-danger btn-remove-x" onclick="removeThuocRow(this)">X</button>
             </div>
         </div>
         <button type="button" class="btn btn-success mt-2" onclick="addThuocRow()">+ Thêm Thuốc</button>
     </div>
+
     <div class="mb-3">
         <label for="TongTien" class="form-label">Tổng Tiền</label>
         <input type="text" class="form-control" id="TongTien" name="TongTien" readonly>
@@ -341,6 +345,15 @@ document.addEventListener("input", function() {
     });
     document.getElementById("TongTien").value = total.toFixed(2);
 });
+
+function updateDonGia(selectElement) {
+    const selectedOption = selectElement.options[selectElement.selectedIndex];
+    const donGia = selectedOption.getAttribute("data-dongia") || "";
+
+    // Lấy ô input đơn giá trong cùng dòng
+    const donGiaInput = selectElement.parentElement.querySelector('input[name="DonGia[]"]');
+    donGiaInput.value = donGia;
+}
 </script>
 <style>
 .form-HD {
