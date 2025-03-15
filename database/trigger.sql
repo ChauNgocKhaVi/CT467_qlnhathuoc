@@ -44,12 +44,17 @@ BEGIN
         SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Email đã tồn tại!';
     END IF;
 
+     -- Kiểm tra số điện thoại trùng
+    IF EXISTS (SELECT 1 FROM Admin WHERE SoDienThoai = NEW.SoDienThoai) THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Số điện thoại đã tồn tại!';
+    END IF;
     -- Kiểm tra số điện thoại có hợp lệ không
     IF NEW.SoDienThoai NOT REGEXP '^[0-9]{10,15}$' THEN
         SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Số điện thoại không hợp lệ!';
     END IF;
 END$$
 
+DELIMITER ;
 
 -- Cập nhật doanh thu khi thêm hóa đơn
 DELIMITER $$
