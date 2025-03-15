@@ -1,6 +1,6 @@
 /* Header */
 .custom-header {
-    background-color: #91c2f3; 
+    background-color: #91c2f3;
     color: white;
     padding: 15px 0;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
@@ -19,31 +19,29 @@
 }
 
 .custom-header .btn-light:hover {
-    background-color: #dbeafe; 
+    background-color: #dbeafe;
 }
 
-/*Trang chào mừng */
-.welcome-container {
-    height: 80vh;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    text-align: center;
-    background-color: #fff; 
+.logo {
+    width: 150px;
+    margin-left: 60px;
 }
 
-.welcome-box {
-    background: rgba(255, 255, 255, 0.95);
-    padding: 40px;
-    border-radius: 15px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    max-width: 600px;
+.navbar-brand a {
+   text-decoration: none; 
+   color: white;
+   font-size: 45px;
+   font-weight: bold;
+}
+
+.logo:hover {
+    transform: scale(1.1);
 }
 
 h1 {
     font-size: 2.5rem;
     font-weight: bold;
-    color: #1E3A5F; 
+    color: #1E3A5F;
 }
 
 p {
