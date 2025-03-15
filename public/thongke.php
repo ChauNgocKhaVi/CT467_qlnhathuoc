@@ -17,6 +17,8 @@
                 <li><a class="dropdown-item" href="#" data-type="ngay">Theo Ngày</a></li>
                 <li><a class="dropdown-item" href="#" data-type="tuan">Theo Tuần</a></li>
                 <li><a class="dropdown-item" href="#" data-type="thang">Theo Tháng</a></li>
+                <li><a class="dropdown-item" href="#" data-type="nam">Theo Năm</a></li>
+
             </ul>
         </div>
 
@@ -36,6 +38,7 @@
                         if ($kieuThongKe == 'ngay') echo "Ngày";
                         elseif ($kieuThongKe == 'tuan') echo "Tuần";
                         elseif ($kieuThongKe == 'thang') echo "Tháng - Năm";
+                        elseif ($kieuThongKe == 'nam') echo "Năm";
                     ?>
                 </th>
                 <th class="text-center">Doanh Thu</th>
@@ -52,7 +55,9 @@
                             echo "Tuần " . $thongke['Tuan'] . " (" . date('d/m', strtotime($thongke['NgayBatDau'])) . " - " . date('d/m', strtotime($thongke['NgayKetThuc'])) . ")";
                         } elseif ($kieuThongKe == 'thang') {
                             echo "Tháng " . $thongke['Thang'] . " Năm " . $thongke['Nam'];
-                        } else {
+                        }elseif ($kieuThongKe == 'nam') {
+                            echo "Năm " . $thongke['Nam'];
+                        }else {
                             echo "Không có dữ liệu";
                         }
                     ?>
