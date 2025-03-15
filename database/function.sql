@@ -16,17 +16,3 @@ END $$
 
 DELIMITER ;
 
--- Kiểm tra số lượng thuốc theo mã
-DELIMITER $$
-CREATE FUNCTION so_luong_thuoc(ma INT) 
-RETURNS INT 
-DETERMINISTIC
-BEGIN
-    DECLARE soLuong INT;
-    SELECT SoLuongTon INTO soLuong FROM Thuoc WHERE MaThuoc = ma;
-    RETURN soLuong;
-END $$
-DELIMITER ;
-
-SELECT so_luong_thuoc(1);
-

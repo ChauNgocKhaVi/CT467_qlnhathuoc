@@ -14,18 +14,6 @@ END $$
 
 DELIMITER ;
 
--- Tự động cập nhật số lượng khi thêm thuốc vào kho
-DELIMITER $$
-CREATE TRIGGER cap_nhat_so_luong_sau_nhap
-AFTER INSERT ON NhapThuoc
-FOR EACH ROW
-BEGIN
-    UPDATE Thuoc 
-    SET SoLuongTon = SoLuongTon + NEW.SoLuongNhap
-    WHERE MaThuoc = NEW.MaThuoc;
-END $$
-DELIMITER ;
-
 -- Kiểm tra trùng lặp
 DROP TRIGGER IF EXISTS kt_trunglap;
 
