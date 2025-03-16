@@ -14,10 +14,10 @@
                 Chọn kiểu thống kê
             </button>
             <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                <li><a class="dropdown-item" href="#" data-type="ngay">Theo Ngày</a></li>
-                <li><a class="dropdown-item" href="#" data-type="tuan">Theo Tuần</a></li>
-                <li><a class="dropdown-item" href="#" data-type="thang">Theo Tháng</a></li>
-                <li><a class="dropdown-item" href="#" data-type="nam">Theo Năm</a></li>
+                <li><a class="dropdown-item dropdown-item1" href="#" data-type="ngay">Theo Ngày</a></li>
+                <li><a class="dropdown-item dropdown-item1" href="#" data-type="tuan">Theo Tuần</a></li>
+                <li><a class="dropdown-item dropdown-item1" href="#" data-type="thang">Theo Tháng</a></li>
+                <li><a class="dropdown-item dropdown-item1" href="#" data-type="nam">Theo Năm</a></li>
 
             </ul>
         </div>
@@ -73,7 +73,7 @@
 <script>
 document.addEventListener("DOMContentLoaded", function() {
     // Xử lý sự kiện khi chọn kiểu thống kê
-    document.querySelectorAll(".dropdown-item").forEach(item => {
+    document.querySelectorAll(".dropdown-item1").forEach(item => {
         item.addEventListener("click", function(e) {
             e.preventDefault();
             let type = this.getAttribute("data-type");

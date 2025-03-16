@@ -6,7 +6,8 @@ DETERMINISTIC
 BEGIN
     DECLARE tong INT DEFAULT 0;
     
-    -- Lấy tổng số lượng thuốc trong kho của loại thuốc cụ thể, loại bỏ các giá trị NULL
+    -- Lấy tổng số lượng thuốc trong kho của
+    -- loại thuốc cụ thể, loại bỏ các giá trị NULL
     SELECT SUM(SoLuongTon) INTO tong
     FROM Thuoc 
     WHERE MaLoai = p_maLoai;

@@ -100,7 +100,6 @@ DELIMITER ;
 
 -- Thống kê Doanh Thu
 DELIMITER $$
-
 CREATE PROCEDURE ThongKeDoanhThu(IN kieuThongKe VARCHAR(10))
 BEGIN
     IF kieuThongKe = 'ngay' THEN
@@ -111,29 +110,28 @@ BEGIN
 
     ELSEIF kieuThongKe = 'tuan' THEN
         SELECT YEARWEEK(NgayLap, 1) AS Tuan, 
-               MIN(DATE(NgayLap)) AS NgayBatDau, 
-               MAX(DATE(NgayLap)) AS NgayKetThuc, 
-               SUM(TongTien) AS DoanhThu
+                MIN(DATE(NgayLap)) AS NgayBatDau, 
+                MAX(DATE(NgayLap)) AS NgayKetThuc, 
+                SUM(TongTien) AS DoanhThu
         FROM HoaDon
         GROUP BY YEARWEEK(NgayLap, 1)
         ORDER BY Tuan DESC;
 
     ELSEIF kieuThongKe = 'thang' THEN
         SELECT YEAR(NgayLap) AS Nam, MONTH(NgayLap) AS Thang, 
-               SUM(TongTien) AS DoanhThu
+                SUM(TongTien) AS DoanhThu
         FROM HoaDon
         GROUP BY YEAR(NgayLap), MONTH(NgayLap)
         ORDER BY Nam DESC, Thang DESC;
 
     ELSEIF kieuThongKe = 'nam' THEN
         SELECT YEAR(NgayLap) AS Nam, 
-               SUM(TongTien) AS DoanhThu
+                SUM(TongTien) AS DoanhThu
         FROM HoaDon
         GROUP BY YEAR(NgayLap)
         ORDER BY Nam DESC;
     END IF;
 END $$
-
 DELIMITER ;
 
 

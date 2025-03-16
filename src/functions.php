@@ -698,9 +698,10 @@ function importKhachHang(PDO $pdo, $sheet)
     return "Đã nhập " . count($data) . " khách hàng.";
 }
 
+// --------------------- THỐNG KÊ --------------------------
+
 // Thống kê doanh thu
-function thongKeDoanhThu($pdo, $kieuThongKe)
-{
+function thongKeDoanhThu($pdo, $kieuThongKe) {
     $thongKeList = [];
     try {
         $stmt = $pdo->prepare("CALL ThongKeDoanhThu(:kieuThongKe)");
@@ -708,10 +709,11 @@ function thongKeDoanhThu($pdo, $kieuThongKe)
         $stmt->execute();
         $thongKeList = $stmt->fetchAll(PDO::FETCH_ASSOC);
     } catch (Exception $e) {
-        echo "Lỗi truy vấn thống kê: " . $e->getMessage();
+        return ["error" => "Lỗi truy vấn thống kê: " . $e->getMessage()];
     }
     return $thongKeList;
 }
+
 
 function hienThiThongKe($title, $data)
 {

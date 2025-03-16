@@ -10,7 +10,7 @@
         <div class="d-flex">
             <button id="searchBtn" class="btn btn-primary me-2">Tìm kiếm</button>
             <input type="text" id="maNCC" class="form-control me-2" placeholder="Mã Nhà cung cấp" />
-            <input type="text" id="tenNCC" class="form-control me-2" placeholder="Mã Nhà cung cấp" />
+            <input type="text" id="tenNCC" class="form-control me-2" placeholder="Tên Nhà cung cấp" />
             <input type="text" id="SoDienThoai" class="form-control me-2" placeholder="Số điện thoại" />
         </div>
 

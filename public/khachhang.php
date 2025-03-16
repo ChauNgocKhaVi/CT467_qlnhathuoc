@@ -10,8 +10,8 @@
         <div class="d-flex">
             <button id="searchBtn" class="btn btn-primary me-2">Tìm kiếm</button>
             <input type="text" id="MaKH" class="form-control me-2" placeholder="Mã khách hàng" />
-            <input type="text" id="TenKH" class="form-control me-2" placeholder="Tên khách hàng" />
-            <input type="text" id="SoDienThoai" class="form-control me-2" placeholder="Số điện thoại" />
+            <input type="text" id="TenKH1" class="form-control me-2" placeholder="Tên khách hàng" />
+            <input type="text" id="SoDienThoai1" class="form-control me-2" placeholder="Số điện thoại" />
         </div>
 
         <!-- Thêm mới -->
@@ -51,13 +51,13 @@
 </div>
 <script>
 document.addEventListener("DOMContentLoaded", function() {
-    let inputs = document.querySelectorAll("#MaKH, #TenKH, #SoDienThoai");
+    let inputs = document.querySelectorAll("#MaKH, #TenKH1, #SoDienThoai1");
 
     inputs.forEach(input => {
         input.addEventListener("input", function() {
             let maKH = document.getElementById("MaKH").value.trim().toLowerCase();
-            let tenKH = document.getElementById("TenKH").value.trim().toLowerCase();
-            let soDienThoai = document.getElementById("SoDienThoai").value.trim().toLowerCase();
+            let tenKH = document.getElementById("TenKH1").value.trim().toLowerCase();
+            let soDienThoai = document.getElementById("SoDienThoai1").value.trim().toLowerCase();
 
             let rows = document.querySelectorAll("tbody tr");
 
