@@ -124,6 +124,13 @@ BEGIN
         FROM HoaDon
         GROUP BY YEAR(NgayLap), MONTH(NgayLap)
         ORDER BY Nam DESC, Thang DESC;
+
+    ELSEIF kieuThongKe = 'nam' THEN
+        SELECT YEAR(NgayLap) AS Nam, 
+               SUM(TongTien) AS DoanhThu
+        FROM HoaDon
+        GROUP BY YEAR(NgayLap)
+        ORDER BY Nam DESC;
     END IF;
 END $$
 
