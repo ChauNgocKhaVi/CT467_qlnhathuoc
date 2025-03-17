@@ -7,6 +7,16 @@ include __DIR__ . '/../src/partials/head.php';
 
 $type = $_GET['id'] ?? ''; // Nếu không có tham số 'type' thì mặc định là 'thuoc'
 
+// Hiển thị lỗi nếu có
+if (isset($_GET['errorKH'])) {
+    echo '<div class="alert alert-danger">' . htmlspecialchars($_GET['errorKH']) . '</div>';
+}
+
+// Hiển thị lỗi nếu có
+if (isset($_GET['error'])) {
+    echo '<div class="alert alert-danger">' . htmlspecialchars($_GET['error']) . '</div>';
+}
+
 // Lấy danh sách thuốc từ CSDL
 $stmtThuoc = $pdo->query("SELECT MaThuoc, TenThuoc, DonGia FROM Thuoc");
 $thuocList = $stmtThuoc->fetchAll(PDO::FETCH_ASSOC);

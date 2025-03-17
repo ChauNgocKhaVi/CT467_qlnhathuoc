@@ -4,7 +4,7 @@
         <div class="d-flex justify-content-between align-items-center mb-3">
             <!-- Tìm kiếm -->
             <div class="d-flex">
-                <button id="searchBtn" class="btn btn-primary me-2">Tìm kiếm</button>
+                <button id="searchBtn" class="btn btn-primary me-2">Tất cả</button>
                 <input type="text" id="maThuoc" class="form-control me-2" placeholder="Mã thuốc" />
                 <input type="text" id="tenThuoc" class="form-control me-2" placeholder="Tên thuốc" />
                 <!-- Dropdown Mã Loại -->
@@ -364,7 +364,19 @@
         let selectedHang = "";
         let selectedNCC = "";
 
+        function formatDate(dateString) {
+            let parts = dateString.split("-");
+            if (parts.length === 3) {
+                return new Date(parts[0], parts[1] - 1, parts[2]); // YYYY-MM-DD
+            }
+            return null;
+        }
+
         function filterTable() {
+            let inputSoLuong = soLuongTonInput.value.trim();
+            let inputHSD = hanSuDungInput.value.trim();
+            let inputHSDDate = inputHSD ? new Date(inputHSD) : null;
+
             tableRows.forEach(row => {
                 let cellMaThuoc = row.cells[0].textContent.trim();
                 let cellTenThuoc = row.cells[1].textContent.trim();
@@ -372,11 +384,9 @@
                 let cellHang = row.cells[3].textContent.trim();
                 let cellNCC = row.cells[4].textContent.trim();
                 let cellGia = row.cells[6].textContent.trim().replace(/\D/g, ''); // Lấy số trong giá tiền
-                let cellSoLuong = parseInt(row.cells[7].textContent.trim().replace(/\D/g, ''), 10) || 0; // Chuyển đổi số lượng thành số nguyên
-                let cellHSD = new Date(row.cells[8].textContent.trim()); // Chuyển đổi ngày hạn sử dụng
-
-                let inputSoLuong = soLuongTonInput.value.trim();
-                let inputHSD = hanSuDungInput.value.trim();
+                let cellSoLuong = parseInt(row.cells[7].textContent.trim().replace(/\D/g, ''), 10) || 0;
+                let cellHSDText = row.cells[8].textContent.trim();
+                let cellHSDDate = formatDate(cellHSDText); // Chuyển đổi về Date object
 
                 let matchMaThuoc = maThuocInput.value === "" || cellMaThuoc.includes(maThuocInput.value);
                 let matchTenThuoc = tenThuocInput.value === "" || cellTenThuoc.toLowerCase().includes(tenThuocInput.value.toLowerCase());
@@ -385,7 +395,7 @@
                 let matchNCC = selectedNCC === "" || cellNCC === selectedNCC;
                 let matchGia = donGiaInput.value === "" || parseInt(cellGia) <= parseInt(donGiaInput.value);
                 let matchSoLuong = inputSoLuong === "" || cellSoLuong === parseInt(inputSoLuong, 10);
-                let matchHSD = inputHSD === "" || cellHSD >= new Date(inputHSD);
+                let matchHSD = inputHSD === "" || (cellHSDDate && cellHSDDate >= inputHSDDate);
 
                 if (matchMaThuoc && matchTenThuoc && matchLoai && matchHang && matchNCC && matchGia && matchSoLuong && matchHSD) {
                     row.style.display = "";
@@ -393,6 +403,25 @@
                     row.style.display = "none";
                 }
             });
+        }
+
+        // Reset toàn bộ bộ lọc về mặc định
+        function resetFilters() {
+            maThuocInput.value = "";
+            tenThuocInput.value = "";
+            donGiaInput.value = "";
+            soLuongTonInput.value = "";
+            hanSuDungInput.value = "";
+
+            selectedLoai = "";
+            selectedHang = "";
+            selectedNCC = "";
+
+            dropdownLoai.textContent = "Chọn Mã Loại";
+            dropdownHang.textContent = "Chọn Hãng SX";
+            dropdownNCC.textContent = "Chọn Nhà Cung Cấp";
+
+            filterTable();
         }
 
         // Lọc theo dropdown Loại
@@ -432,10 +461,11 @@
         soLuongTonInput.addEventListener("input", filterTable);
         hanSuDungInput.addEventListener("input", filterTable);
 
-        // Lọc khi bấm nút tìm kiếm
+        // Khi bấm vào nút "Tất cả" -> Reset bộ lọc
         searchBtn.addEventListener("click", function () {
-            filterTable();
+            resetFilters();
         });
     });
+
 
 </script>

@@ -128,10 +128,11 @@ function layTatCaThuoc(PDO $pdo): array
             JOIN LoaiThuoc l ON t.MaLoai = l.MaLoai
             JOIN HangSX h ON t.MaHangSX = h.MaHangSX
             JOIN NhaCungCap n ON t.MaNCC = n.MaNCC
-            ";
+            ORDER BY t.MaThuoc";  // Sắp xếp theo mã thuốc
     $stmt = $pdo->query($query);
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
+
 
 // Lấy thông tin thuốc theo ID
 function layThuocTheoID(PDO $pdo, int $maThuoc): array|false
@@ -632,14 +633,55 @@ function importThuoc(PDO $pdo, $sheet)
     $data = $sheet->toArray();
     array_shift($data); // Bỏ qua tiêu đề
 
-    $stmt = $pdo->prepare("INSERT INTO Thuoc (MaLoai, MaHangSX, MaNCC, TenThuoc, CongDung, DonGia, SoLuongTon, HanSuDung) 
-                            VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+    // Chuẩn bị câu lệnh SELECT để lấy mã Loại, Hãng, NCC
+    $stmtLoai = $pdo->prepare("SELECT MaLoai FROM LoaiThuoc WHERE TenLoai = ?");
+    $stmtHangSX = $pdo->prepare("SELECT MaHangSX FROM HangSX WHERE TenHang = ?");
+    $stmtNCC = $pdo->prepare("SELECT MaNCC FROM NhaCungCap WHERE TenNCC = ?");
+
+    // Chuẩn bị câu lệnh INSERT vào bảng Thuoc
+    $stmtInsert = $pdo->prepare("INSERT INTO Thuoc (MaLoai, MaHangSX, MaNCC, TenThuoc, CongDung, DonGia, SoLuongTon, HanSuDung) 
+                                VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
 
     foreach ($data as $row) {
-        $stmt->execute([$row[0], $row[1], $row[2], $row[3], $row[4], $row[5], $row[6], $row[7]]);
+        // Lấy mã Loại Thuốc từ bảng LoaiThuoc theo tên Loại (cột A)
+        $stmtLoai->execute([$row[0]]);
+        $maLoai = $stmtLoai->fetchColumn(); // Lấy mã Loại từ câu lệnh SELECT
+
+        // Nếu không tìm thấy mã Loại, tiếp tục bỏ qua dòng này
+        if (!$maLoai) {
+            continue; // Hoặc bạn có thể thêm xử lý lỗi nếu muốn
+        }
+
+        // Lấy mã Hãng Sản Xuất
+        $stmtHangSX->execute([$row[1]]);
+        $maHangSX = $stmtHangSX->fetchColumn();
+
+        // Kiểm tra xem mã Hãng SX có tồn tại không
+        if (!$maHangSX) {
+            // Nếu không tìm thấy, bạn có thể xử lý như thêm hãng vào bảng HangSX
+            // Hoặc báo lỗi
+            continue; // Bỏ qua dòng này
+        }
+
+        // Lấy mã Nhà Cung Cấp
+        $stmtNCC->execute([$row[2]]);
+        $maNCC = $stmtNCC->fetchColumn();
+
+        // Kiểm tra xem mã Hãng SX có tồn tại không
+        if (!$maNCC) {
+            // Nếu không tìm thấy, bạn có thể xử lý như thêm hãng vào bảng HangSX
+            // Hoặc báo lỗi
+            continue; // Bỏ qua dòng này
+        }
+
+        // Chèn dữ liệu vào bảng Thuoc
+        $stmtInsert->execute([$maLoai, $maHangSX, $maNCC, $row[3], $row[4], $row[5], $row[6], $row[7]]);
     }
+
     return "Đã nhập " . count($data) . " thuốc.";
 }
+
+
 
 // Nhập dữ liệu từ sheet Loại Thuốc
 function importLoaiThuoc(PDO $pdo, $sheet)
@@ -701,7 +743,8 @@ function importKhachHang(PDO $pdo, $sheet)
 // --------------------- THỐNG KÊ --------------------------
 
 // Thống kê doanh thu
-function thongKeDoanhThu($pdo, $kieuThongKe) {
+function thongKeDoanhThu($pdo, $kieuThongKe)
+{
     $thongKeList = [];
     try {
         $stmt = $pdo->prepare("CALL ThongKeDoanhThu(:kieuThongKe)");

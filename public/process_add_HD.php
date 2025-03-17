@@ -19,10 +19,26 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $soDienThoai = trim($_POST['SoDienThoai']);
             $diaChi = trim($_POST['DiaChi']);
 
+            // Kiểm tra nếu thông tin khách hàng không đầy đủ
             if (empty($tenKH) || empty($soDienThoai) || empty($diaChi)) {
                 throw new Exception("Thông tin khách hàng không đầy đủ.");
             }
 
+            // Kiểm tra số điện thoại hợp lệ (10-15 ký tự và chỉ chứa số)
+            if (!preg_match('/^[0-9]{10,15}$/', $soDienThoai)) {
+                throw new Exception("Số điện thoại không hợp lệ.");
+            }
+
+            // Kiểm tra số điện thoại có bị trùng trong cơ sở dữ liệu không
+            $stmt = $pdo->prepare("SELECT COUNT(*) FROM KhachHang WHERE SoDienThoai = ?");
+            $stmt->execute([$soDienThoai]);
+            $count = $stmt->fetchColumn();
+
+            if ($count > 0) {
+                throw new Exception("Số điện thoại đã tồn tại.");
+            }
+
+            // Thêm khách hàng vào cơ sở dữ liệu
             $stmt = $pdo->prepare("INSERT INTO KhachHang (TenKH, SoDienThoai, DiaChi) VALUES (?, ?, ?)");
             $stmt->execute([$tenKH, $soDienThoai, $diaChi]);
             $maKH = $pdo->lastInsertId();
@@ -37,7 +53,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         // Thêm chi tiết hóa đơn và tính tổng tiền
         $stmt = $pdo->prepare("INSERT INTO ChiTietHoaDon (MaHD, MaThuoc, SoLuongBan, GiaBan) VALUES (?, ?, ?, ?)");
-        
+
         foreach ($thuocList as $index => $maThuoc) {
             $maThuoc = intval($maThuoc);
             $soLuong = isset($soLuongList[$index]) ? intval($soLuongList[$index]) : 0;
@@ -54,17 +70,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $stmt->execute([$tongTien, $maHD]);
 
         $pdo->commit(); // Xác nhận transaction
-        
+
         header("Location: index.php?success=1");
         exit();
     } catch (Exception $e) {
         $pdo->rollBack(); // Hủy bỏ transaction nếu có lỗi
-        die("Lỗi: " . $e->getMessage());
+        // Chuyển hướng về trang thêm hóa đơn với thông báo lỗi
+        header("Location: add.php?id=formHD&error=" . urlencode($e->getMessage()));
+        exit();
     }
 } else {
     header("Location: index.php");
     exit();
 }
-
-
 ?>
