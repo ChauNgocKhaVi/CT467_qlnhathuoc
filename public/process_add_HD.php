@@ -62,6 +62,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             if ($maThuoc > 0 && $soLuong > 0 && $giaBan >= 0) {
                 $tongTien += $soLuong * $giaBan;
                 $stmt->execute([$maHD, $maThuoc, $soLuong, $giaBan]);
+
+                // Trừ số lượng tồn kho
+                $stmtUpdateStock = $pdo->prepare("UPDATE Thuoc SET SoLuongTon = SoLuongTon - ? WHERE MaThuoc = ?");
+                $stmtUpdateStock->execute([$soLuong, $maThuoc]);
             }
         }
 
