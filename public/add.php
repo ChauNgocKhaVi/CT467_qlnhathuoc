@@ -13,6 +13,21 @@ if (isset($_GET['errorKH'])) {
 }
 
 // Hiển thị lỗi nếu có
+if (isset($_GET['errorNCC'])) {
+    echo '<div class="alert alert-danger">' . htmlspecialchars($_GET['errorNCC']) . '</div>';
+}
+
+// Hiển thị lỗi nếu có
+if (isset($_GET['errorLoai'])) {
+    echo '<div class="alert alert-danger">' . htmlspecialchars($_GET['errorLoai']) . '</div>';
+}
+
+// Hiển thị lỗi nếu có
+if (isset($_GET['errorHSX'])) {
+    echo '<div class="alert alert-danger">' . htmlspecialchars($_GET['errorHSX']) . '</div>';
+}
+
+// Hiển thị lỗi nếu có
 if (isset($_GET['error'])) {
     echo '<div class="alert alert-danger">' . htmlspecialchars($_GET['error']) . '</div>';
 }

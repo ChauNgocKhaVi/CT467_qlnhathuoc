@@ -628,6 +628,7 @@ function getChiTietHoaDonExcel($maHD, PDO $pdo)
 }
 
 // Nhập dữ liệu từ sheet Thuốc
+// Nhập dữ liệu từ sheet Thuốc
 function importThuoc(PDO $pdo, $sheet)
 {
     $data = $sheet->toArray();
@@ -637,41 +638,44 @@ function importThuoc(PDO $pdo, $sheet)
     $stmtLoai = $pdo->prepare("SELECT MaLoai FROM LoaiThuoc WHERE TenLoai = ?");
     $stmtHangSX = $pdo->prepare("SELECT MaHangSX FROM HangSX WHERE TenHang = ?");
     $stmtNCC = $pdo->prepare("SELECT MaNCC FROM NhaCungCap WHERE TenNCC = ?");
+    $stmtCheckThuoc = $pdo->prepare("SELECT * FROM Thuoc WHERE TenThuoc = ?");
 
     // Chuẩn bị câu lệnh INSERT vào bảng Thuoc
     $stmtInsert = $pdo->prepare("INSERT INTO Thuoc (MaLoai, MaHangSX, MaNCC, TenThuoc, CongDung, DonGia, SoLuongTon, HanSuDung) 
                                 VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
 
     foreach ($data as $row) {
+        // Kiểm tra tên thuốc có bị trùng không
+        $stmtCheckThuoc->execute([$row[3]]);
+        $existingThuoc = $stmtCheckThuoc->fetch();
+
+        if ($existingThuoc) {
+            continue; // Nếu tên thuốc đã tồn tại, bỏ qua
+        }
+
         // Lấy mã Loại Thuốc từ bảng LoaiThuoc theo tên Loại (cột A)
         $stmtLoai->execute([$row[0]]);
         $maLoai = $stmtLoai->fetchColumn(); // Lấy mã Loại từ câu lệnh SELECT
 
         // Nếu không tìm thấy mã Loại, tiếp tục bỏ qua dòng này
         if (!$maLoai) {
-            continue; // Hoặc bạn có thể thêm xử lý lỗi nếu muốn
+            continue;
         }
 
         // Lấy mã Hãng Sản Xuất
         $stmtHangSX->execute([$row[1]]);
         $maHangSX = $stmtHangSX->fetchColumn();
 
-        // Kiểm tra xem mã Hãng SX có tồn tại không
         if (!$maHangSX) {
-            // Nếu không tìm thấy, bạn có thể xử lý như thêm hãng vào bảng HangSX
-            // Hoặc báo lỗi
-            continue; // Bỏ qua dòng này
+            continue; // Nếu không tìm thấy hãng, bỏ qua dòng này
         }
 
         // Lấy mã Nhà Cung Cấp
         $stmtNCC->execute([$row[2]]);
         $maNCC = $stmtNCC->fetchColumn();
 
-        // Kiểm tra xem mã Hãng SX có tồn tại không
         if (!$maNCC) {
-            // Nếu không tìm thấy, bạn có thể xử lý như thêm hãng vào bảng HangSX
-            // Hoặc báo lỗi
-            continue; // Bỏ qua dòng này
+            continue; // Nếu không tìm thấy nhà cung cấp, bỏ qua dòng này
         }
 
         // Chèn dữ liệu vào bảng Thuoc
@@ -681,19 +685,28 @@ function importThuoc(PDO $pdo, $sheet)
     return "Đã nhập " . count($data) . " thuốc.";
 }
 
-
-
 // Nhập dữ liệu từ sheet Loại Thuốc
 function importLoaiThuoc(PDO $pdo, $sheet)
 {
     $data = $sheet->toArray();
-    array_shift($data);
+    array_shift($data); // Bỏ qua tiêu đề
 
-    $stmt = $pdo->prepare("INSERT INTO LoaiThuoc (TenLoai, DonViTinh) VALUES (?, ?)");
+    $stmtCheckLoai = $pdo->prepare("SELECT * FROM LoaiThuoc WHERE TenLoai = ?");
+    $stmtInsert = $pdo->prepare("INSERT INTO LoaiThuoc (TenLoai, DonViTinh) VALUES (?, ?)");
 
     foreach ($data as $row) {
-        $stmt->execute([$row[0], $row[1]]);
+        // Kiểm tra tên loại thuốc có bị trùng không
+        $stmtCheckLoai->execute([$row[0]]);
+        $existingLoai = $stmtCheckLoai->fetch();
+
+        if ($existingLoai) {
+            continue; // Nếu tên loại đã tồn tại, bỏ qua
+        }
+
+        // Chèn dữ liệu vào bảng LoaiThuoc
+        $stmtInsert->execute([$row[0], $row[1]]);
     }
+
     return "Đã nhập " . count($data) . " loại thuốc.";
 }
 
@@ -701,13 +714,24 @@ function importLoaiThuoc(PDO $pdo, $sheet)
 function importNhaCungCap(PDO $pdo, $sheet)
 {
     $data = $sheet->toArray();
-    array_shift($data);
+    array_shift($data); // Bỏ qua tiêu đề
 
-    $stmt = $pdo->prepare("INSERT INTO NhaCungCap (TenNCC, SoDienThoai) VALUES (?, ?)");
+    $stmtCheckNCC = $pdo->prepare("SELECT * FROM NhaCungCap WHERE TenNCC = ?");
+    $stmtInsert = $pdo->prepare("INSERT INTO NhaCungCap (TenNCC, SoDienThoai) VALUES (?, ?)");
 
     foreach ($data as $row) {
-        $stmt->execute([$row[0], $row[1]]);
+        // Kiểm tra tên nhà cung cấp có bị trùng không
+        $stmtCheckNCC->execute([$row[0]]);
+        $existingNCC = $stmtCheckNCC->fetch();
+
+        if ($existingNCC) {
+            continue; // Nếu tên nhà cung cấp đã tồn tại, bỏ qua
+        }
+
+        // Chèn dữ liệu vào bảng NhaCungCap
+        $stmtInsert->execute([$row[0], $row[1]]);
     }
+
     return "Đã nhập " . count($data) . " nhà cung cấp.";
 }
 
@@ -717,10 +741,20 @@ function importHangSanXuat(PDO $pdo, $sheet)
     $data = $sheet->toArray();
     array_shift($data);  // Bỏ qua tiêu đề
 
-    $stmt = $pdo->prepare("INSERT INTO HangSX (TenHang, QuocGia) VALUES (?, ?)");
+    $stmtCheckHangSX = $pdo->prepare("SELECT * FROM HangSX WHERE TenHang = ?");
+    $stmtInsert = $pdo->prepare("INSERT INTO HangSX (TenHang, QuocGia) VALUES (?, ?)");
 
     foreach ($data as $row) {
-        $stmt->execute([$row[0], $row[1]]);
+        // Kiểm tra tên hãng sản xuất có bị trùng không
+        $stmtCheckHangSX->execute([$row[0]]);
+        $existingHangSX = $stmtCheckHangSX->fetch();
+
+        if ($existingHangSX) {
+            continue; // Nếu tên hãng đã tồn tại, bỏ qua
+        }
+
+        // Chèn dữ liệu vào bảng HangSX
+        $stmtInsert->execute([$row[0], $row[1]]);
     }
 
     return "Đã nhập " . count($data) . " hãng sản xuất.";

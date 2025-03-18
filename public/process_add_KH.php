@@ -3,7 +3,7 @@ require_once __DIR__ . '/../src/bootstrap.php';
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $tenKH = $_POST['TenKH'] ?? '';
-    $soDienThoai = $_POST['SoDienThoai'] ?? '';
+    $soDienThoai = trim($_POST['SoDienThoai'] ?? '');
     $diaChi = $_POST['DiaChi'] ?? '';
 
     // Kiểm tra số điện thoại hợp lệ (chỉ chấp nhận số từ 10 đến 15 chữ số)
